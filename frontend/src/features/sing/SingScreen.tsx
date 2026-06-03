@@ -11,6 +11,7 @@ import { findLineIndex } from '../../lib/lrcParser'
 import { useYouTubePlayer } from '../../hooks/useYouTubePlayer'
 import { useLyrics } from '../../hooks/useLyrics'
 import { useMicPitch, type PitchFrame } from '../../hooks/useMicPitch'
+import ExtractRequest from './ExtractRequest'
 import { pitchShiftBuffer } from '../../lib/pitchShift'
 import type { ScoreState } from '../../audio/scorer'
 import { MelodyScorer } from '../../audio/melodyScorer'
@@ -39,6 +40,8 @@ interface ScorerLike {
 }
 
 const YT_API_KEY = (import.meta.env.VITE_YOUTUBE_API_KEY as string | undefined) ?? ''
+// 로컬 백엔드(VITE_LYRICS_API)가 있으면 직접 추출, 없으면(정적 배포) "추출 요청" 흐름
+const HAS_LOCAL_BACKEND = !!(import.meta.env.VITE_LYRICS_API as string | undefined)
 
 export default function SingScreen() {
   const { videoId = '' } = useParams()
@@ -549,7 +552,7 @@ export default function SingScreen() {
                 <button onClick={removeNoteMap} disabled={extracting} style={ghostBtn}>삭제</button>
               </div>
             </>
-          ) : (
+          ) : HAS_LOCAL_BACKEND ? (
             <>
               <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-xs)' }}>
                 정밀 채점을 위해 <b>먼저 원곡 멜로디를 추출</b>해야 합니다. (수십 초 소요, 추출 후 캐시되어 다음엔 즉시)
@@ -558,6 +561,8 @@ export default function SingScreen() {
                 {extracting ? '⏳ 원곡 분석 중… (수십 초)' : '🎵 원곡에서 자동 추출'}
               </button>
             </>
+          ) : (
+            <ExtractRequest videoId={videoId} title={parsed?.trackName || title || videoId} />
           )}
           {extracting && progress && (
             <div style={{ marginTop: 'var(--space-xs)' }}>
