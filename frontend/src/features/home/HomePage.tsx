@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ChartList from '../chart/ChartList'
 import AccountChip from '../../components/AccountChip'
+import AdminButton from '../../components/AdminButton'
 import { useAccountStore, isAdminName } from '../../store/account'
 import { useSessionStore } from '../../store/session'
 import { listSessions, getProfile, type SessionResult } from '../../lib/storage'
@@ -56,8 +57,9 @@ export default function HomePage() {
 
   return (
     <main style={{ position: 'relative', maxWidth: 860, margin: '0 auto', padding: 'var(--space-md) var(--space-gutter) var(--space-xl)' }}>
-      {/* 헤더 우측상단 계정 (로그인/로그아웃) */}
-      <div style={{ position: 'absolute', top: 'var(--space-sm)', right: 'var(--space-gutter)', zIndex: 6 }}>
+      {/* 헤더 우측상단: 관리자(자동) + 계정 */}
+      <div style={{ position: 'absolute', top: 'var(--space-sm)', right: 'var(--space-gutter)', zIndex: 6, display: 'flex', gap: 'var(--space-xs)', alignItems: 'center' }}>
+        <AdminButton variant="glass" />
         <AccountChip />
       </div>
 

@@ -1,6 +1,7 @@
 // NavBar.tsx — 화면 공통 헤더: 큰 로고(홈 링크) + 뒤로/앞으로 + 페이지 제목
 import { useNavigate } from 'react-router-dom'
 import Logo from './Logo'
+import AdminButton from './AdminButton'
 
 export default function NavBar({ title }: { title?: React.ReactNode }) {
   const navigate = useNavigate()
@@ -9,7 +10,8 @@ export default function NavBar({ title }: { title?: React.ReactNode }) {
     <header style={{ marginBottom: 'var(--space-md)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-sm)' }}>
         <Logo />
-        <div style={{ display: 'flex', gap: 'var(--space-xs)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-xs)', flexShrink: 0, alignItems: 'center' }}>
+          <AdminButton />
           <button onClick={() => navigate(-1)} style={iconBtn} title="뒤로" aria-label="뒤로">←</button>
           <button onClick={() => navigate(1)} style={iconBtn} title="앞으로" aria-label="앞으로">→</button>
         </div>

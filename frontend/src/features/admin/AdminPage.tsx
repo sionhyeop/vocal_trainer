@@ -1,6 +1,6 @@
 // AdminPage.tsx — 관리자 모드: 곡 추가·고정 + 가사 편집·고정. (비밀 닉네임 로그인 + 서버 시크릿)
 import { useCallback, useEffect, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import NavBar from '../../components/NavBar'
 import { useAccountStore, isAdminName } from '../../store/account'
 import { parseVideoId } from '../../lib/youtube'
@@ -23,7 +23,10 @@ export default function AdminPage() {
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: 'var(--space-lg) var(--space-gutter)' }}>
       <NavBar title="관리자" />
-      <h1 style={{ fontSize: 'var(--font-size-heading)', fontWeight: 'var(--font-weight-heavy)', color: 'var(--color-beetle)', margin: '0 0 var(--space-xs)' }}>⚙ 관리자 모드</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-sm)', margin: '0 0 var(--space-xs)' }}>
+        <h1 style={{ fontSize: 'var(--font-size-heading)', fontWeight: 'var(--font-weight-heavy)', color: 'var(--color-beetle)', margin: 0 }}>⚙ 관리자 모드</h1>
+        <Link to="/" style={exitBtn}>← 나가기</Link>
+      </div>
       <p style={{ color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md)' }}>곡과 가사를 추가·고정합니다. 저장 시 리포에 커밋되어 1~2분 후 라이브에 반영됩니다.</p>
 
       {/* 관리자 시크릿 */}
@@ -191,6 +194,7 @@ function LyricsManager({ secret }: { secret: string }) {
   )
 }
 
+const exitBtn: React.CSSProperties = { flexShrink: 0, padding: '8px 16px', borderRadius: 'var(--radius-pill)', border: 'var(--border-width) solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text)', fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-caption)', textDecoration: 'none', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }
 const input: React.CSSProperties = { padding: '8px 10px', borderRadius: 'var(--radius-md)', border: 'var(--border-width) solid var(--color-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-caption)' }
 const ta: React.CSSProperties = { ...input, width: '100%', fontFamily: 'monospace', resize: 'vertical' }
 const card: React.CSSProperties = { border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-md)' }
