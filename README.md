@@ -57,5 +57,17 @@ git push -u origin main
    - `VITE_LYRICS_API` = (빈 값 — 가사 직접 호출용)
 4. **Deploy** → 공개 URL 생성. 이후 `git push`하면 자동 재배포, PR엔 미리보기 URL.
 
-> 나중에 임의 곡 실시간 추출까지 원하면, 무거운 추출 백엔드(Demucs/CREPE)를
-> Hugging Face Spaces 등에 별도 배포하고 `VITE_LYRICS_API`를 그 주소로 설정.
+### 3) 새 곡 추가 워크플로 (로컬 추출 → 자동 배포)
+무거운 추출은 **내 컴퓨터(로컬 백엔드)** 에서 하고, 결과만 GitHub에 올려 라이브에 반영한다.
+```bash
+# 1) 로컬 백엔드로 원곡 추출 (앱에서 "원곡에서 자동 추출" 또는 API 호출)
+#    → backend/cache/<videoId>.json 생성됨
+# 2) 동기화 + 자동 배포
+./scripts/sync-notemaps.sh            # cache → public/notemaps 복사 후 commit+push
+./scripts/sync-notemaps.sh --watch    # 추출 감지해 자동으로 동기화+push (백그라운드)
+```
+push되면 Vercel이 자동 재배포 → 잠시 후 라이브 사이트에서 그 곡도 채점 가능.
+(정적 `public/notemaps/<videoId>.json`을 프론트가 자동 로드)
+
+> 한 단계 더: 웹 방문자가 새 곡 추출을 *요청*하면 내 컴퓨터가 처리해 전달하는 기능은
+> "요청 큐 + 로컬 워커" 방식으로 위 파이프라인을 확장하면 된다(아래 backend/REMOTE_EXTRACT.md 참고 예정).
