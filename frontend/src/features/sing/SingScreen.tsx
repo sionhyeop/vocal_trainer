@@ -61,7 +61,7 @@ export default function SingScreen() {
   // 가사 수동 교정: 자유 입력을 제목 파서로 분해(가수/제목 자동 분리, 순서 바뀌어도 OK)
   const [manualQuery, setManualQuery] = useState<ParsedTitle | null>(null)
   const lyricInput = manualQuery ?? parsed
-  const lyrics = useLyrics(lyricInput)
+  const lyrics = useLyrics(lyricInput, videoId)
   const { containerRef, ready, status, errorMsg, getCurrentTime, play, pause, seekTo, getPlayerState } =
     useYouTubePlayer(videoId)
 

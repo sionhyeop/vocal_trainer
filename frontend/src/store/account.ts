@@ -3,6 +3,12 @@ import { create } from 'zustand'
 
 const KEY = 'vt:account'
 
+// 관리자 닉네임(환경변수). 이 이름으로 로그인하면 관리자 UI 노출. (UI 게이팅용 — 실제 쓰기는 서버 시크릿으로 보호)
+export const ADMIN_NAME = (import.meta.env.VITE_ADMIN_NAME as string | undefined) || ''
+export function isAdminName(name: string | undefined | null): boolean {
+  return !!ADMIN_NAME && name === ADMIN_NAME
+}
+
 export interface Account {
   name: string
   since: number

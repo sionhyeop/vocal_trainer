@@ -12,6 +12,7 @@ import EchoGame from '../features/games/EchoGame'
 import EarGame from '../features/games/EarGame'
 import HistoryScreen from '../features/history/HistoryScreen'
 import ProfilePage from '../features/profile/ProfilePage'
+import AdminPage from '../features/admin/AdminPage'
 import NoteMapViewPage from '../features/notemap/NoteMapViewPage'
 import StatusPage from '../features/status/StatusPage'
 import ErrorPage from '../features/error/ErrorPage'
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
       { path: 'games/ear', element: <EarGame /> },
       { path: 'history', element: <HistoryScreen /> },
       { path: 'profile', element: <ProfilePage /> },
+      { path: 'admin', element: <AdminPage /> },
       { path: 'mic-test', element: <MicTestPage /> },
       { path: 'notemap', element: <NoteMapViewPage /> },
       { path: 'status', element: <StatusPage /> },

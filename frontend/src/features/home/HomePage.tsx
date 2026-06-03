@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ChartList from '../chart/ChartList'
 import AccountChip from '../../components/AccountChip'
-import { useAccountStore } from '../../store/account'
+import { useAccountStore, isAdminName } from '../../store/account'
 import { useSessionStore } from '../../store/session'
 import { listSessions, getProfile, type SessionResult } from '../../lib/storage'
 import { midiToNoteName } from '../../lib/midi'
@@ -151,6 +151,7 @@ export default function HomePage() {
         <Link to="/mic-test" style={footLink}>🎤 마이크 진단</Link>
         <Link to="/notemap" style={footLink}>🎼 추출 음정 보기</Link>
         <Link to="/status" style={footLink}>🔧 중간 점검</Link>
+        {isAdminName(account?.name) && <Link to="/admin" style={{ ...footLink, color: 'var(--color-beetle)' }}>⚙ 관리자</Link>}
       </div>
     </main>
   )

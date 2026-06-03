@@ -70,7 +70,7 @@ const EMPTY: LyricsResult = {
   source: null,
 }
 
-export function useLyrics(parsed: ParsedTitle | null): LyricsResult {
+export function useLyrics(parsed: ParsedTitle | null, videoId?: string): LyricsResult {
   const [result, setResult] = useState<LyricsResult>(EMPTY)
 
   // 원시값으로 분해 (객체 참조를 의존성에 넣으면 매 렌더 새 참조 → 무한 루프)
@@ -78,9 +78,10 @@ export function useLyrics(parsed: ParsedTitle | null): LyricsResult {
   const artistName = parsed?.artistName ?? ''
   const altTrack = parsed?.alternate?.trackName ?? ''
   const altArtist = parsed?.alternate?.artistName ?? ''
+  const vid = videoId ?? ''
 
   useEffect(() => {
-    if (!trackName) {
+    if (!trackName && !vid) {
       setResult(EMPTY)
       return
     }
@@ -89,6 +90,29 @@ export function useLyrics(parsed: ParsedTitle | null): LyricsResult {
     setResult({ ...EMPTY, status: 'loading' })
 
     ;(async () => {
+      // 0) 관리자 고정 가사(정적) 우선 — /lyrics/<videoId>.json
+      if (vid) {
+        try {
+          const res = await fetch(`${import.meta.env.BASE_URL}lyrics/${vid}.json`, { signal: controller.signal })
+          if (res.ok) {
+            const d = (await res.json()) as { synced?: string | null; plain?: string | null }
+            if (!aborted && (d.synced || d.plain)) {
+              setResult({
+                lines: d.synced ? mergeShortLines(parseLrc(d.synced)) : [],
+                plain: d.plain ?? null,
+                status: 'ok',
+                matched: '고정 가사',
+                source: 'direct',
+              })
+              return
+            }
+          }
+        } catch {
+          if (aborted || controller.signal.aborted) return
+          /* 고정 가사 없음 → 자동 흐름 */
+        }
+      }
+      if (!trackName) { if (!aborted) setResult({ ...EMPTY, status: 'notfound' }); return }
       // 시도 조합: 주추정 → alternate (track/artist 뒤바뀜 대비)
       const attempts: Array<{ track: string; artist?: string }> = [
         { track: trackName, artist: artistName || undefined },
@@ -170,7 +194,7 @@ export function useLyrics(parsed: ParsedTitle | null): LyricsResult {
       aborted = true
       controller.abort()
     }
-  }, [trackName, artistName, altTrack, altArtist])
+  }, [trackName, artistName, altTrack, altArtist, vid])
 
   return result
 }
