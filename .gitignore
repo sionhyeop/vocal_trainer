@@ -1,0 +1,28 @@
+# ── 의존성 (package.json / requirements.txt 로 재생성, 절대 커밋 금지) ──
+frontend/node_modules/
+backend/.venv/
+**/__pycache__/
+*.pyc
+
+# ── 빌드 산출물 ──
+frontend/dist/
+frontend/.vite/
+
+# ── 캐시 / 생성물 ──
+# 추출된 노트맵 캐시 (videoId별). 정적 배포본은 frontend/public/notemaps/ 에 동봉됨.
+backend/cache/
+
+# ── 환경변수 / 비밀키 (절대 커밋 금지) ──
+.env
+.env.local
+frontend/.env
+frontend/.env.local
+backend/.env
+
+# ── OS / 에디터 ──
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,18 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+curl_cffi>=0.7
+anthropic
+# 방법 A — 원곡 멜로디 자동 추출
+yt-dlp
+librosa
+soundfile
+numpy
+# 피치 검출: torchcrepe(CREPE, torch 재사용). 설치 실패 시 pyin 폴백
+torchcrepe
+# polyphonic 노트(EDM/처리된 보컬용): basic-pitch는 TF 없이 onnx로.
+#   uv pip install --no-deps basic-pitch  +  onnxruntime mir_eval pretty_midi mido
+onnxruntime
+mir_eval
+pretty_midi
+mido
+# (선택) 보컬 분리: demucs  ← 설치돼 있으면 자동 사용

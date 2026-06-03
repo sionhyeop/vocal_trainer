@@ -1,0 +1,165 @@
+/* tokens.css — DESIGN.md 디자인 토큰 단일 소스 (Duolingo 스타일)
+ * 규칙: CSS에서는 var(--token)만 사용. 토큰에 없는 값은 DESIGN.md에 먼저 추가 후 사용. */
+
+:root {
+  /* ── 1. Color Palette ─────────────────────────────── */
+  /* 브랜드 — Feather Green */
+  --color-primary: #58cc02;        /* 시그니처 그린 (메인 버튼/강조) */
+  --color-primary-shadow: #58a700; /* 그린 버튼 하단 3D 그림자 */
+  --color-primary-hover: #61e002;  /* 호버 상태 */
+
+  /* 보조 컬러 (동물 네이밍) */
+  --color-macaw: #1cb0f6;          /* 블루 (정보/링크) */
+  --color-macaw-shadow: #1899d6;
+  --color-cardinal: #ff4b4b;       /* 레드 (오답/경고) */
+  --color-bee: #ffc800;            /* 옐로우 (스트릭/보상) */
+  --color-fox: #ff9600;            /* 오렌지 */
+  --color-beetle: #ce82ff;         /* 퍼플 */
+
+  /* 배경 */
+  --color-bg: #ffffff;             /* 기본 배경 (순백) */
+  --color-bg-subtle: #f7f7f7;      /* 보조 배경 (Snow, 섹션 구분) */
+
+  /* 텍스트 */
+  --color-text: #4b4b4b;           /* 주 텍스트 (Eel, 다크 그레이) */
+  --color-text-secondary: #777777; /* 보조 텍스트 (Wolf) */
+  --color-text-inverse: #ffffff;   /* 컬러 버튼 위 텍스트 */
+
+  /* 테두리 */
+  --color-border: #e5e5e5;         /* 기본 구분선 (Swan) */
+
+  /* ── 2. Typography ────────────────────────────────── */
+  --font-family: "Feather Bold", "din-round", -apple-system,
+                 "Helvetica Neue", Arial, sans-serif;
+
+  --font-size-hero: 48px;     /* 대형 hero 헤드라인 */
+  --font-size-heading: 32px;  /* 섹션 제목 */
+  --font-size-subhead: 22px;  /* 소제목 */
+  --font-size-body: 17px;     /* 본문 */
+  --font-size-caption: 13px;  /* 캡션 / 각주 */
+
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-heavy: 800;   /* hero 헤드라인용 */
+
+  --line-height-tight: 1.2;   /* 헤딩용 */
+  --line-height-normal: 1.5;  /* 본문용 */
+
+  /* ── 3. Spacing (8px 그리드) ───────────────────────── */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --space-xl: 64px;
+  --space-section: 72px;      /* 섹션 간 수직 간격 */
+  --space-gutter: 24px;       /* 좌우 여백(거터) */
+
+  /* ── 4. Effects ───────────────────────────────────── */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-button: 0 4px 0 var(--color-primary-shadow); /* 3D 버튼 */
+
+  --blur-overlay: 8px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;          /* 카드/버튼 기본 */
+  --radius-pill: 9999px;      /* 알약형 / 원형 요소 */
+
+  --border-width: 2px;        /* 두꺼운 테두리 (만화 느낌) */
+
+  /* ── 5. Animation ─────────────────────────────────── */
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 400ms;
+
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);    /* 부드러운 ease-in-out */
+  --easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);/* 탄성 바운스 (보상 연출) */
+}
+
+/* 기본 리셋 + 베이스 타이포 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 판정 팝 애니메이션 (보상 연출) */
+@keyframes judgePop {
+  0% { transform: scale(0.6); opacity: 0; }
+  35% { transform: scale(1.15); opacity: 1; }
+  70% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* 카드 호버 리프트(랜딩) */
+.lift {
+  transition: transform var(--duration-fast) var(--easing-default),
+              box-shadow var(--duration-fast) var(--easing-default);
+}
+.lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.lift:active {
+  transform: translateY(-1px);
+}
+
+/* 히어로 등장 */
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 히어로: 사운드 이퀄라이저 막대 */
+@keyframes eq {
+  0%, 100% { transform: scaleY(0.22); }
+  50% { transform: scaleY(1); }
+}
+
+/* 히어로: 부유하는 글로우/마이크 */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* 히어로: 글로우 펄스 */
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+
+/* 히어로 콘텐츠 순차 등장 */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 진행바 shimmer (단계 내 활동 표시) */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 카운트다운 숫자 */
+@keyframes countPop {
+  0% { transform: scale(1.6); opacity: 0; }
+  30% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
