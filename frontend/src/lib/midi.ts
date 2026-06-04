@@ -30,3 +30,14 @@ export function centsFromNearest(midi: number): number {
 export function centsFromTarget(midi: number, targetMidi: number): number {
   return (midi - targetMidi) * 100
 }
+
+/**
+ * 옥타브 무관 편차(cents) — 12반음(옥타브) 차이를 동일 음으로 간주해 접는다.
+ * 마이크의 가장 흔한 불안정(저음/배음으로 인한 옥타브 오검출)을 정답으로 관대하게 인식하기 위함.
+ * 반환은 [-600, 600] cents 범위의 가장 가까운 동음 편차.
+ */
+export function centsFromTargetOctaveFolded(midi: number, targetMidi: number): number {
+  let d = ((midi - targetMidi) % 12 + 12) % 12 // 0..12 반음
+  if (d > 6) d -= 12 // -6..6 (가장 가까운 동음)
+  return d * 100
+}

@@ -1,7 +1,7 @@
 // melodyScorer.ts — Tier A 노트맵 기반 정밀 채점 (PLAN §2.2 Tier A 판정 로직)
 // 목표 노트 활성 구간 동안 cent 편차를 누적 → 노트 종료 시 평균 편차 + 커버리지로 판정.
 import type { Note } from '../lib/noteMap'
-import { centsFromTarget } from '../lib/midi'
+import { centsFromTargetOctaveFolded } from '../lib/midi'
 import { JUDGMENT_POINTS, judge, type Judgment } from '../lib/score'
 import type { ScoreState } from './scorer'
 
@@ -37,8 +37,8 @@ export class MelodyScorer {
     const { sumAbsCents, voiced, total } = this.acc
     let j: Judgment
     const coverage = total > 0 ? voiced / total : 0
-    if (coverage < 0.25 || voiced === 0) {
-      j = 'Miss' // 목표 구간 거의 안 부름
+    if (coverage < 0.15 || voiced === 0) {
+      j = 'Miss' // 목표 구간 거의 안 부름 (커버리지 임계 완화 0.25→0.15)
     } else {
       // 평균 cent 편차 기반, score.ts의 관대한 임계 재사용
       j = judge(sumAbsCents / voiced, true)
@@ -75,7 +75,8 @@ export class MelodyScorer {
       this.acc.total++
       if (userMidi != null) {
         this.acc.voiced++
-        this.acc.sumAbsCents += Math.abs(centsFromTarget(userMidi, this.notes[idx].midiNote))
+        // 옥타브 무관 편차 — 마이크 옥타브 오검출을 정답으로 흡수
+        this.acc.sumAbsCents += Math.abs(centsFromTargetOctaveFolded(userMidi, this.notes[idx].midiNote))
       }
     }
     return finalized

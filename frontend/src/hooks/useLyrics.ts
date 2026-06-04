@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react'
 import { parseLrc, mergeShortLines, type LyricLine } from '../lib/lrcParser'
 import type { ParsedTitle } from '../lib/titleParser'
+import { getLyricsConfirm } from '../lib/storage'
 
 export type LyricsStatus = 'idle' | 'loading' | 'ok' | 'notfound' | 'error'
 
@@ -70,7 +71,7 @@ const EMPTY: LyricsResult = {
   source: null,
 }
 
-export function useLyrics(parsed: ParsedTitle | null, videoId?: string): LyricsResult {
+export function useLyrics(parsed: ParsedTitle | null, videoId?: string, refreshKey = 0): LyricsResult {
   const [result, setResult] = useState<LyricsResult>(EMPTY)
 
   // 원시값으로 분해 (객체 참조를 의존성에 넣으면 매 렌더 새 참조 → 무한 루프)
@@ -90,7 +91,15 @@ export function useLyrics(parsed: ParsedTitle | null, videoId?: string): LyricsR
     setResult({ ...EMPTY, status: 'loading' })
 
     ;(async () => {
-      // 0) 관리자 고정 가사(정적) 우선 — /lyrics/<videoId>.json
+      // 0) "정확해요"로 확정된 로컬 캐시 우선 — API 재호출 없이 즉시 사용
+      if (vid) {
+        const c = getLyricsConfirm(vid)
+        if (c && (c.lines.length || c.plain)) {
+          setResult({ lines: c.lines, plain: c.plain, status: 'ok', matched: c.matched, source: 'direct' })
+          return
+        }
+      }
+      // 0b) 관리자 고정 가사(정적) — /lyrics/<videoId>.json
       if (vid) {
         try {
           const res = await fetch(`${import.meta.env.BASE_URL}lyrics/${vid}.json`, { signal: controller.signal })
@@ -194,7 +203,7 @@ export function useLyrics(parsed: ParsedTitle | null, videoId?: string): LyricsR
       aborted = true
       controller.abort()
     }
-  }, [trackName, artistName, altTrack, altArtist, vid])
+  }, [trackName, artistName, altTrack, altArtist, vid, refreshKey])
 
   return result
 }

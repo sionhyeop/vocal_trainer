@@ -3,19 +3,20 @@
 
 export type Judgment = 'Perfect' | 'Great' | 'Good' | 'Miss'
 
-// noteScore = max(40, 100 - |cents| * 0.25) → 100c=75, 200c=50, 그 외도 최소 40점 바닥(완전 빗나가면 0)
+// noteScore — 더 관대하게: 바닥 점수↑, 0점 컷오프↑ (입력 불안정 흡수)
 export function scoreFromCents(cents: number): number {
   const a = Math.abs(cents)
-  if (a > 250) return 0 // 반음(100c)을 한참 넘게 벗어나면 0
-  return Math.max(40, 100 - a * 0.25)
+  if (a > 320) return 0
+  return Math.max(45, 100 - a * 0.2)
 }
 
-// 판정 임계 — 관대하게: 반음(100c) 안쪽이면 Good 이상
+// 판정 임계 — 매우 관대하게: 입력값이 불안정해도 정답으로 잘 인식.
+//   (옥타브 오검출은 호출부에서 옥타브-폴딩으로 이미 흡수됨)
 export function judge(absCents: number, voiced: boolean): Judgment {
   if (!voiced) return 'Miss'
-  if (absCents <= 45) return 'Perfect'
-  if (absCents <= 90) return 'Great'
-  if (absCents <= 160) return 'Good'
+  if (absCents <= 70) return 'Perfect'   // 45 → 70
+  if (absCents <= 130) return 'Great'    // 90 → 130
+  if (absCents <= 220) return 'Good'     // 160 → 220 (반음 2개 이상까지 Good)
   return 'Miss'
 }
 

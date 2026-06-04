@@ -2,6 +2,7 @@
 import type { Judgment } from './score'
 import type { BreathSummary } from '../audio/breathAnalyzer'
 import type { WeakSection } from '../features/result/weakSections'
+import type { LyricLine } from './lrcParser'
 
 export interface SessionResult {
   id: string
@@ -112,4 +113,27 @@ export function totalStars(): number {
   let n = 0
   for (const g of Object.values(all)) for (const s of Object.values(g)) n += s
   return n
+}
+
+// ── 가사 확정 캐시 ("정확해요" 체크 시 고정 → 재호출 없이 즉시 사용) ──
+export interface LyricsConfirm {
+  lines: LyricLine[]
+  plain: string | null
+  matched: string | null
+}
+const lyrKey = (videoId: string) => `vt:lyrics:${videoId}`
+
+export function getLyricsConfirm(videoId: string): LyricsConfirm | null {
+  try {
+    const raw = localStorage.getItem(lyrKey(videoId))
+    return raw ? (JSON.parse(raw) as LyricsConfirm) : null
+  } catch {
+    return null
+  }
+}
+export function saveLyricsConfirm(videoId: string, data: LyricsConfirm): void {
+  try { localStorage.setItem(lyrKey(videoId), JSON.stringify(data)) } catch { /* noop */ }
+}
+export function clearLyricsConfirm(videoId: string): void {
+  try { localStorage.removeItem(lyrKey(videoId)) } catch { /* noop */ }
 }

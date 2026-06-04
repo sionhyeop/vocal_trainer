@@ -33,7 +33,9 @@ function smooth(values: number[], win: number): number[] {
 
 /** 정렬된 contour 샘플 → 노트 배열 */
 export function contourToNotes(samples: ContourSample[], opts: SegmentOptions = {}): Note[] {
-  const { smoothWindow = 5, minNoteMs = 90, maxGapMs = 90, connectGapMs = 350 } = opts
+  // 기본값을 "끊김 최소화" 쪽으로: 짧은 노트도 살리고(minNoteMs↓), 같은 음 병합 폭↑,
+  // 빈틈 브릿지 임계↑(연속 피치). connectGapMs 이하 간격은 앞 음을 끌어 메운다.
+  const { smoothWindow = 5, minNoteMs = 60, maxGapMs = 120, connectGapMs = 1200 } = opts
   if (samples.length === 0) return []
 
   const sorted = [...samples].sort((a, b) => a.tMs - b.tMs)
@@ -66,10 +68,24 @@ export function contourToNotes(samples: ContourSample[], opts: SegmentOptions = 
   }
   close(lastT)
 
-  // 인접 노트 사이 작은 빈틈 메우기 — 앞 노트 끝을 다음 노트 시작까지 늘림
+  return bridgeGaps(notes, connectGapMs)
+}
+
+/**
+ * 빈 피치 자동 연결(갭필) 알고리즘 — "보컬에 맞게 끊김없이 이어지도록".
+ *
+ * 추출 곡선은 자음·숨·순간 F0 드롭아웃 때문에 노트 사이에 빈틈이 생긴다. 그대로 두면 노래방
+ * 리본의 목표 막대가 깜빡이며 끊긴다. 이 함수는 인접 노트 사이 간격이 `bridgeMs` 이하이면
+ * **앞 노트를 다음 노트 시작까지 끌어(sustain)** 빈틈을 없앤다 — 직전 음을 유지하다 다음
+ * 음의 진짜 onset에서 깔끔히 전환하므로 채점 정합(타이밍)도 보존된다.
+ *
+ * 단, `bridgeMs`(기본 1.2초)를 넘는 큰 간격은 *실제 쉼표/간주*로 보고 메우지 않는다
+ * (없는 발성을 채점하지 않기 위함). 임계만 키우면 더 공격적으로 이을 수 있다.
+ */
+export function bridgeGaps(notes: Note[], bridgeMs = 1200): Note[] {
   for (let i = 0; i < notes.length - 1; i++) {
     const gap = notes[i + 1].startMs - notes[i].endMs
-    if (gap > 0 && gap <= connectGapMs) notes[i].endMs = notes[i + 1].startMs
+    if (gap > 0 && gap <= bridgeMs) notes[i].endMs = notes[i + 1].startMs
   }
   return notes
 }

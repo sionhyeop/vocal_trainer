@@ -21,7 +21,7 @@ import { loadNoteMap, saveNoteMap, deleteNoteMap } from '../../lib/noteMapStore'
 import { extractNoteMapFromOriginal, fetchExtractProgress, loadCachedNoteMap, type ExtractMethod, type ExtractProgress } from '../../lib/extractNoteMap'
 import { analyzeBreath, type SessionFrame, type BreathSummary } from '../../audio/breathAnalyzer'
 import { computeWeakSections, type WeakSection } from '../result/weakSections'
-import { saveSession } from '../../lib/storage'
+import { saveSession, getLyricsConfirm, saveLyricsConfirm, clearLyricsConfirm } from '../../lib/storage'
 import ResultPanel from '../result/ResultPanel'
 import { drawMelodyRibbon, MAX_HISTORY, type RibbonSample } from './ribbonDraw'
 import LyricView from './LyricView'
@@ -61,7 +61,21 @@ export default function SingScreen() {
   // 가사 수동 교정: 자유 입력을 제목 파서로 분해(가수/제목 자동 분리, 순서 바뀌어도 OK)
   const [manualQuery, setManualQuery] = useState<ParsedTitle | null>(null)
   const lyricInput = manualQuery ?? parsed
-  const lyrics = useLyrics(lyricInput, videoId)
+  const [lyrRefresh, setLyrRefresh] = useState(0)
+  const lyrics = useLyrics(lyricInput, videoId, lyrRefresh)
+  // "정확해요" 확정 상태 (확정 시 가사를 로컬 고정 → API 재호출 안 함)
+  const [lyricsConfirmed, setLyricsConfirmed] = useState(false)
+  useEffect(() => { setLyricsConfirmed(!!getLyricsConfirm(videoId)) }, [videoId])
+  const toggleLyricsConfirm = useCallback(() => {
+    if (lyricsConfirmed) {
+      clearLyricsConfirm(videoId)
+      setLyricsConfirmed(false)
+      setLyrRefresh((n) => n + 1) // 고정 해제 → 다시 자동 조회
+    } else if (lyrics.status === 'ok' && (lyrics.lines.length || lyrics.plain)) {
+      saveLyricsConfirm(videoId, { lines: lyrics.lines, plain: lyrics.plain, matched: lyrics.matched })
+      setLyricsConfirmed(true)
+    }
+  }, [lyricsConfirmed, videoId, lyrics])
   const { containerRef, ready, status, errorMsg, getCurrentTime, play, pause, seekTo, getPlayerState } =
     useYouTubePlayer(videoId)
 
@@ -472,6 +486,13 @@ export default function SingScreen() {
           <span style={{ alignSelf: 'center', fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>
             현재 매칭: {lyrics.matched}
           </span>
+        )}
+        {/* 정확해요 — 체크 시 이 가사를 고정(로컬 저장)해 다음부턴 API 재호출 없이 즉시 사용 */}
+        {(lyrics.status === 'ok' || lyricsConfirmed) && (
+          <label style={{ alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-bold)', color: lyricsConfirmed ? 'var(--color-primary)' : 'var(--color-text-secondary)' }}>
+            <input type="checkbox" checked={lyricsConfirmed} onChange={toggleLyricsConfirm} />
+            ✓ 가사 정확해요 (고정)
+          </label>
         )}
       </div>
 
