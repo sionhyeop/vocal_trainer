@@ -44,7 +44,7 @@ def get_lyrics(
 @app.get("/api/notemap")
 def get_notemap(
     videoId: str = Query(..., min_length=5),
-    maxSeconds: int = Query(120, ge=15, le=300),
+    maxSeconds: int = Query(120, ge=15, le=600),  # 프론트는 풀곡 추출로 600 전송 → melody.py가 곡 길이(360s)까지 클램프
     force: bool = Query(False),
     method: str = Query("auto", pattern="^(auto|crepe|basicpitch)$"),
     cachedOnly: bool = Query(False),
