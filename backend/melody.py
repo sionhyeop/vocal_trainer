@@ -19,6 +19,21 @@ import librosa
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
+# 추출분을 정적 배포 폴더(frontend/public/notemaps)에도 같이 저장 → git에 잡혀
+# 커밋·푸시만 하면 라이브에 자동 포함(수동 배포). 폴더 없거나 실패해도 추출은 성공 유지.
+STATIC_NOTEMAPS_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "frontend", "public", "notemaps")
+)
+
+
+def _publish_static(video_id: str, result: dict) -> None:
+    try:
+        os.makedirs(STATIC_NOTEMAPS_DIR, exist_ok=True)
+        with open(os.path.join(STATIC_NOTEMAPS_DIR, f"{video_id}.json"), "w", encoding="utf-8") as f:
+            json.dump(result, f)
+    except Exception as e:  # 정적 폴더 쓰기 실패가 추출 자체를 깨지 않게
+        print(f"[publish_static] {video_id} 정적 배포폴더 저장 실패(무시): {e}")
+
 # 인트로(도입부)가 길어도 본 노래를 담기 위한 추가 스캔 여유(초)와 상한.
 # 전체 곡 추출: 프론트가 max_seconds를 크게(예: 600) 보내면 곡 길이(상한 360초)까지 스캔해
 # 보컬 시작점부터 끝까지 추출한다.
@@ -288,7 +303,9 @@ def extract_notemap(
     cache = _cache_path(video_id)
     if not force and os.path.exists(cache):
         with open(cache, "r", encoding="utf-8") as f:
-            return json.load(f)
+            result = json.load(f)
+        _publish_static(video_id, result)  # 이미 캐시된 곡도 배포 폴더에 보장
+        return result
 
     tmp = tempfile.mkdtemp(prefix=f"melody_{video_id}_")
     try:
@@ -330,6 +347,7 @@ def extract_notemap(
         }
         with open(cache, "w", encoding="utf-8") as f:
             json.dump(result, f)
+        _publish_static(video_id, result)  # 추출 즉시 배포 폴더에도 — 커밋·푸시만 하면 라이브 반영
         _set_progress(video_id, "완료", 100)
         return result
     except Exception:
