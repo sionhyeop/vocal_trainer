@@ -53,19 +53,17 @@ export default async function handler(req, res) {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), 12000)
   try {
-    // q 자유검색 변형들 (구조화 검색은 lrclib에서 신뢰 불가)
+    // q 자유검색 변형들 (구조화 검색은 lrclib에서 신뢰 불가). lrclib이 느려 병렬로 호출.
     const queries = artist ? [`${artist} ${track}`, `${track} ${artist}`, track] : [track]
-    const seen = new Map()
-    for (const q of queries) {
-      try {
-        const arr = await lrclibSearch(q, ctrl.signal)
-        for (const r of arr) {
-          const k = String(r.id ?? `${r.trackName}|${r.artistName}`)
-          if (!seen.has(k)) seen.set(k, r)
-        }
-      } catch { /* 다음 쿼리 */ }
-    }
+    const results = await Promise.all(queries.map((q) => lrclibSearch(q, ctrl.signal).catch(() => [])))
     clearTimeout(timer)
+    const seen = new Map()
+    for (const arr of results) {
+      for (const r of arr) {
+        const k = String(r.id ?? `${r.trackName}|${r.artistName}`)
+        if (!seen.has(k)) seen.set(k, r)
+      }
+    }
 
     const cands = [...seen.values()]
     if (!cands.length) return res.status(404).json({ error: 'not found' })
