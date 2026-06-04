@@ -406,7 +406,7 @@ export default function SingScreen() {
   const [extracting, setExtracting] = useState(false)
   const [extractErr, setExtractErr] = useState('')
   const [progress, setProgress] = useState<ExtractProgress | null>(null)
-  const extractSecs = 60 // 자동(고정)
+  const extractSecs = 600 // 전체 곡 추출 (백엔드가 곡 길이까지 스캔, 보컬 시작점부터 끝까지)
   const [extractMethod, setExtractMethod] = useState<ExtractMethod>('auto')
   const autoExtract = useCallback(
     async (force: boolean) => {

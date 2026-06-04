@@ -49,7 +49,7 @@ process_one() {
   # 추출(블로킹). 최대 10분.
   local code
   code="$(curl -s -o /tmp/notemap_out.json -w '%{http_code}' -m 600 \
-    "$BACKEND/api/notemap?videoId=$vid&method=auto&maxSeconds=60")"
+    "$BACKEND/api/notemap?videoId=$vid&method=auto&maxSeconds=600")"
 
   if [ "$code" != "200" ]; then
     local detail; detail="$(head -c 300 /tmp/notemap_out.json 2>/dev/null)"

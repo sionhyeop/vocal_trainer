@@ -19,9 +19,11 @@ import librosa
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-# 인트로(도입부)가 길어도 본 노래를 담기 위한 추가 스캔 여유(초)와 상한
+# 인트로(도입부)가 길어도 본 노래를 담기 위한 추가 스캔 여유(초)와 상한.
+# 전체 곡 추출: 프론트가 max_seconds를 크게(예: 600) 보내면 곡 길이(상한 360초)까지 스캔해
+# 보컬 시작점부터 끝까지 추출한다.
 INTRO_SCAN_SECONDS = 75
-MAX_SCAN_SECONDS = 180
+MAX_SCAN_SECONDS = 360
 
 
 def _cache_path(video_id: str) -> str:
