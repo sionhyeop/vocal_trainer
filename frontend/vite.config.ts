@@ -61,4 +61,7 @@ function localApi(mode: string): Plugin {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [react(), localApi(mode)],
+  // WSL2 + /mnt/c(윈도우 마운트)는 inotify가 안 떠 파일 변경을 못 잡는다(편집해도 HMR 미반영).
+  // 폴링 감시로 강제해야 .tsx/.ts/.css 편집이 dev에 반영된다.
+  server: { watch: { usePolling: true, interval: 200 } },
 }))
