@@ -90,6 +90,15 @@ export default function SingScreen() {
     } else if (lyrics.status === 'ok' && (lyrics.lines.length || lyrics.plain)) {
       saveLyricsConfirm(videoId, { lines: lyrics.lines, plain: lyrics.plain, matched: lyrics.matched })
       setLyricsConfirmed(true)
+      // 정적 배포 파일로도 발행(노트맵 자동저장과 동일 — dev에서만 기록, prod read-only 무시).
+      // → "배포해" 시 노트맵과 함께 커밋되어 라이브에 가사 즉시 표시.
+      fetch('/api/publish-lyrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{ videoId, lines: lyrics.lines, plain: lyrics.plain, matched: lyrics.matched, offsetSec: offsetRef.current }],
+        }),
+      }).catch(() => { /* prod/오프라인 무시 */ })
     }
   }, [lyricsConfirmed, videoId, lyrics])
   const { containerRef, ready, status, errorMsg, getCurrentTime, play, pause, seekTo, getPlayerState } =
@@ -111,6 +120,8 @@ export default function SingScreen() {
     const artist = fixArtist.trim()
     const track = fixTrack.trim()
     if (!artist && !track) return
+    clearLyricsConfirm(videoId) // 자동저장된 캐시 무시하고 재검색(잘못 잡힌 가사 교정)
+    setLyricsConfirmed(false)
     const t = track || artist // 제목 칸이 비면 가수 칸을 제목으로
     const a = track ? artist : ''
     setManualQuery({
@@ -118,6 +129,7 @@ export default function SingScreen() {
       artistName: a,
       alternate: a ? { trackName: a, artistName: t } : undefined,
     })
+    setLyrRefresh((n) => n + 1)
   }
   const [phase, setPhase] = useState<Phase>('idle')
   const phaseRef = useRef<Phase>('idle')

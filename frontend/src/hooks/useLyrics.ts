@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { parseLrc, mergeShortLines, type LyricLine } from '../lib/lrcParser'
 import type { ParsedTitle } from '../lib/titleParser'
-import { getLyricsConfirm } from '../lib/storage'
+import { getLyricsConfirm, saveLyricsConfirm } from '../lib/storage'
 
 export type LyricsStatus = 'idle' | 'loading' | 'ok' | 'notfound' | 'error'
 
@@ -158,13 +158,18 @@ export function useLyrics(parsed: ParsedTitle | null, videoId?: string, refreshK
         try {
           const res = await fetch(`${import.meta.env.BASE_URL}lyrics/${vid}.json`, { signal: controller.signal })
           if (res.ok) {
-            const d = (await res.json()) as { synced?: string | null; plain?: string | null }
-            if (!aborted && (d.synced || d.plain)) {
+            const d = (await res.json()) as {
+              synced?: string | null; plain?: string | null; lines?: LyricLine[]
+              matched_artist?: string | null; matched_track?: string | null
+            }
+            // 로컬 캐시 발행분은 파싱된 lines를 그대로 싣기도 함 → 있으면 우선 사용
+            const lines = d.lines && d.lines.length ? d.lines : (d.synced ? mergeShortLines(parseLrc(d.synced)) : [])
+            if (!aborted && (lines.length || d.plain)) {
               setResult({
-                lines: d.synced ? mergeShortLines(parseLrc(d.synced)) : [],
+                lines,
                 plain: d.plain ?? null,
                 status: 'ok',
-                matched: '고정 가사',
+                matched: [d.matched_artist, d.matched_track].filter(Boolean).join(' - ') || '고정 가사',
                 source: 'direct',
               })
               return
@@ -188,13 +193,21 @@ export function useLyrics(parsed: ParsedTitle | null, videoId?: string, refreshK
       // (정적 배포에서 브라우저가 lrclib을 직접 못 부르므로[CORS] 서버측 프록시가 필수)
       // 엔드포인트가 완전히 실패하면 브라우저 직접 lrclib을 최후 폴백으로 1회 시도.
       const setFromData = (data: LyricsApiResponse, source: 'backend' | 'direct') => {
-        setResult({
-          lines: data.synced ? mergeShortLines(parseLrc(data.synced)) : [],
-          plain: data.plain ?? null,
-          status: 'ok',
-          matched: [data.matched_artist, data.matched_track].filter(Boolean).join(' - ') || null,
-          source,
-        })
+        const lines = data.synced ? mergeShortLines(parseLrc(data.synced)) : []
+        const matched = [data.matched_artist, data.matched_track].filter(Boolean).join(' - ') || null
+        setResult({ lines, plain: data.plain ?? null, status: 'ok', matched, source })
+        // 한 번 불러오면 자동 저장 → 다음엔 재호출 없이 즉시(persist).
+        // dev에선 정적 배포파일(public/lyrics)로도 발행 → "배포해" 시 함께 올라감. (prod는 read-only라 생략)
+        if (vid) {
+          saveLyricsConfirm(vid, { lines, plain: data.plain ?? null, matched })
+          if (import.meta.env.DEV) {
+            fetch('/api/publish-lyrics', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ items: [{ videoId: vid, lines, plain: data.plain ?? null, matched }] }),
+            }).catch(() => { /* 무시 */ })
+          }
+        }
       }
       for (const a of attempts) {
         try {
