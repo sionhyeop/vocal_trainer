@@ -40,26 +40,79 @@ async function fetchBackend(
   return { data: await res.json(), status: 200 }
 }
 
-// 브라우저 직접 lrclib (백엔드 완전 실패 시 안전망)
+// ── 브라우저 직접 lrclib 검색 + 랭킹 (백엔드와 동일 품질) ──────────────
+// lrclib의 구조화 검색(artist_name)은 0을 반환하는 경우가 많아 q 자유검색을 주로 쓰고,
+// 후보를 모아 제목/아티스트 유사도 + 싱크/한글 가중으로 최선을 고른다(엉뚱한 가사 방지).
+function _norm(s: string | undefined | null): string {
+  let t = (s || '').toLowerCase()
+  t = t.replace(/\(feat[^)]*\)/g, ' ').replace(/\b(feat|ft|featuring|prod)\.?\b.*/g, ' ')
+  t = t.replace(/[^0-9a-z가-힣぀-ヿ一-鿿\s]/g, ' ')
+  return t.replace(/\s+/g, ' ').trim()
+}
+// bigram Dice 유사도 [0,1] (difflib ratio 근사)
+function _sim(a?: string | null, b?: string | null): number {
+  const na = _norm(a), nb = _norm(b)
+  if (!na || !nb) return 0
+  if (na === nb) return 1
+  const bg = (s: string) => { const g: string[] = []; for (let i = 0; i < s.length - 1; i++) g.push(s.slice(i, i + 2)); return g }
+  const A = bg(na), B = bg(nb)
+  if (!A.length || !B.length) return na === nb ? 1 : 0
+  const m = new Map<string, number>()
+  for (const g of A) m.set(g, (m.get(g) || 0) + 1)
+  let inter = 0
+  for (const g of B) { const c = m.get(g); if (c) { inter++; m.set(g, c - 1) } }
+  return (2 * inter) / (A.length + B.length)
+}
+function _hasHangul(s?: string | null): boolean { return /[가-힣]/.test(s || '') }
+function _scoreCand(c: any, track: string, artist: string | undefined, wantHangul: boolean): number {
+  const ts = _sim(track, c.trackName)
+  let score = artist ? 0.65 * ts + 0.35 * _sim(artist, c.artistName) : ts
+  if (c.syncedLyrics) score += 0.08
+  if (wantHangul) score += _hasHangul(c.syncedLyrics || c.plainLyrics) ? 0.2 : -0.35
+  return score
+}
+
 async function fetchDirect(
   track: string,
   artist: string | undefined,
   signal: AbortSignal,
 ): Promise<LyricsApiResponse | null> {
-  const url = new URL('https://lrclib.net/api/search')
-  url.searchParams.set('track_name', track)
-  if (artist) url.searchParams.set('artist_name', artist)
-  const res = await fetch(url.toString(), { signal })
-  if (!res.ok) return null
-  const arr = await res.json()
-  const list: any[] = Array.isArray(arr) ? arr : []
-  const hit = list.find((d) => d.syncedLyrics) ?? list[0]
-  if (!hit) return null
+  // q 자유검색 변형들 (구조화 검색은 lrclib에서 신뢰 불가)
+  const queries = artist ? [`${artist} ${track}`, `${track} ${artist}`, track] : [track]
+  const seen = new Map<string, any>()
+  for (const q of queries) {
+    try {
+      const url = new URL('https://lrclib.net/api/search')
+      url.searchParams.set('q', q)
+      const res = await fetch(url.toString(), { signal })
+      if (!res.ok) continue
+      const arr = await res.json()
+      for (const r of (Array.isArray(arr) ? arr : [])) {
+        const key = String(r.id ?? `${r.trackName}|${r.artistName}`)
+        if (!seen.has(key)) seen.set(key, r)
+      }
+    } catch {
+      if (signal.aborted) return null
+    }
+  }
+  const cands = [...seen.values()]
+  if (!cands.length) return null
+
+  const wantHangul = _hasHangul(track) || _hasHangul(artist) ||
+    cands.some((c) => _hasHangul(c.syncedLyrics || c.plainLyrics))
+  const sc = (c: any) => _scoreCand(c, track, artist, wantHangul)
+  let best = cands.reduce((a, b) => (sc(b) > sc(a) ? b : a))
+  const bestScore = sc(best)
+  if (bestScore < 0.45) return null // 충분히 안 맞으면 차라리 없음(오매칭 방지)
+  // 상위권(0.1 이내)에서 싱크 가사 우선
+  const near = cands.filter((c) => sc(c) >= bestScore - 0.1)
+  const synced = near.filter((c) => c.syncedLyrics)
+  if (synced.length) best = synced.reduce((a, b) => (sc(b) > sc(a) ? b : a))
   return {
-    synced: hit.syncedLyrics,
-    plain: hit.plainLyrics,
-    matched_track: hit.trackName,
-    matched_artist: hit.artistName,
+    synced: best.syncedLyrics,
+    plain: best.plainLyrics,
+    matched_track: best.trackName,
+    matched_artist: best.artistName,
   }
 }
 
