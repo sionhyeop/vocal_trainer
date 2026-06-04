@@ -1,37 +1,9 @@
 [
   {
-    "title": "갑자기",
-    "artist": "I.O.I",
-    "videoId": "Jxgbfc89hNI",
-    "ytTitle": "아이오아이 (I.O.I) - 갑자기 (Suddenly) MV",
-    "category": "한국"
-  },
-  {
-    "title": "REDRED",
-    "artist": "CORTIS",
-    "videoId": "U6BDbXIah-Y",
-    "ytTitle": "CORTIS (코르티스) 'REDRED' Official MV",
-    "category": "한국"
-  },
-  {
-    "title": "It's Me",
-    "artist": "ILLIT",
-    "videoId": "lOpdrEgmYzY",
-    "ytTitle": "ILLIT (아일릿) 'It’s Me’ Official MV (Performance ver.)",
-    "category": "한국"
-  },
-  {
-    "title": "LEMONADE",
-    "artist": "aespa",
-    "videoId": "83C3TZ4Zm_o",
-    "ytTitle": "aespa 에스파 'LEMONADE' MV",
-    "category": "한국"
-  },
-  {
     "title": "캐치 캐치",
     "artist": "YENA (최예나)",
-    "videoId": "NOiyDlWl534",
-    "ytTitle": "YENA (최예나) - 캐치 캐치 (Catch Catch) MV",
+    "videoId": "DKR0796ujio",
+    "ytTitle": "YENA - Catch Catch (Lyrics)",
     "category": "한국"
   },
   {
@@ -42,52 +14,213 @@
     "category": "한국"
   },
   {
-    "title": "Heavy Serenade",
-    "artist": "NMIXX",
-    "videoId": "a4n15qSygsA",
-    "ytTitle": "[풀버전] 최종 6인 합격 무대 | NMIXX - Heavy Serenade | MIXX SERENADE(믹스 세레나데)",
+    "title": "REDRED",
+    "artist": "CORTIS",
+    "videoId": "llsR2eTdlI4",
+    "ytTitle": "CORTIS (코르티스) 'REDRED' (Color Coded Lyrics)",
     "category": "한국"
   },
   {
-    "title": "BANG BANG",
-    "artist": "IVE",
-    "videoId": "9qkpcLK422o",
-    "ytTitle": "IVE 아이브 'BANG BANG' MV",
+    "title": "WDA (Whole Different Animal)",
+    "artist": "aespa",
+    "videoId": "iTJSbJtS8MU",
+    "ytTitle": "aespa 에스파 'WDA (Whole Different Animal) (Feat. G-DRAGON)' MV",
+    "category": "한국"
+  },
+  {
+    "title": "갑자기",
+    "artist": "I.O.I",
+    "videoId": "Jxgbfc89hNI",
+    "ytTitle": "아이오아이 (I.O.I) - 갑자기 (Suddenly) MV",
+    "category": "한국"
+  },
+  {
+    "title": "LEMONADE",
+    "artist": "aespa",
+    "videoId": "83C3TZ4Zm_o",
+    "ytTitle": "aespa 에스파 'LEMONADE' MV",
+    "category": "한국"
+  },
+  {
+    "title": "Heavy Serenade",
+    "artist": "NMIXX",
+    "videoId": "6Ycn9qZK09I",
+    "ytTitle": "NMIXX(엔믹스) “Heavy Serenade” M/V",
+    "category": "한국"
+  },
+  {
+    "title": "LOVE ATTACK",
+    "artist": "RESCENE 리센느",
+    "videoId": "9XttLI0oH0I",
+    "ytTitle": "RESCENE (리센느) ‘LOVE ATTACK’ Official MV",
+    "category": "한국"
+  },
+  {
+    "title": "Drowning",
+    "artist": "WOODZ",
+    "videoId": "XD__iZhK4MM",
+    "ytTitle": "[선공개] 조승연 상병 (WOODZ) - Drowning [불후의 명곡2 전설을 노래하다/Immortal Songs 2] | KBS 방송",
     "category": "한국"
   },
   {
     "title": "404 (New Era)",
     "artist": "KiiiKiii",
-    "videoId": "3_l-UI4prVY",
-    "ytTitle": "404 (New Era)",
+    "videoId": "zhHB4dZTChw",
+    "ytTitle": "KiiiKiii 키키 '404 (New Era)' MV",
     "category": "한국"
   },
   {
-    "title": "뛰어 (JUMP)",
+    "title": "BANG BANG",
+    "artist": "IVE (아이브)",
+    "videoId": "9qkpcLK422o",
+    "ytTitle": "IVE 아이브 'BANG BANG' MV",
+    "category": "한국"
+  },
+  {
+    "title": "Good Goodbye",
+    "artist": "화사 (HWASA)",
+    "videoId": "Qe8fa4b5xNU",
+    "ytTitle": "화사 (HWASA) - 'Good Goodbye' MV",
+    "category": "한국"
+  },
+  {
+    "title": "Popcorn",
+    "artist": "도경수 (D.O.)",
+    "videoId": "fw77hyiICu8",
+    "ytTitle": "도경수(D.O.) - Popcorn [더 시즌즈-지코의 아티스트] | KBS 240510 방송",
+    "category": "한국"
+  },
+  {
+    "title": "SWIM",
+    "artist": "방탄소년단 (BTS)",
+    "videoId": "wt08t0fu53E",
+    "ytTitle": "BTS (방탄소년단) 'SWIM' (Color Coded Lyrics)",
+    "category": "한국"
+  },
+  {
+    "title": "It's Me",
+    "artist": "ILLIT",
+    "videoId": "xU06iU17sWo",
+    "ytTitle": "ILLIT (아일릿) - It's Me | Show! MusicCore | MBC260530방송",
+    "category": "한국"
+  },
+  {
+    "title": "Blue Valentine",
+    "artist": "NMIXX",
+    "videoId": "EmeW6li6bbo",
+    "ytTitle": "NMIXX(엔믹스) “Blue Valentine” M/V",
+    "category": "한국"
+  },
+  {
+    "title": "Golden",
+    "artist": "HUNTRIX",
+    "videoId": "htk6MRjmcnQ",
+    "ytTitle": "Huntrix - Golden (Lyrics) KPop Demon Hunters",
+    "category": "한국"
+  },
+  {
+    "title": "뛰어 JUMP",
     "artist": "BLACKPINK",
-    "videoId": "RUKqwwyAiEU",
-    "ytTitle": "BLACKPINK - ‘뛰어(JUMP)’ (Official Audio)",
+    "videoId": "CgCVZdcKcqY",
+    "ytTitle": "BLACKPINK - ‘뛰어(JUMP)’ M/V",
     "category": "한국"
   },
   {
-    "title": "AIZO",
-    "artist": "King Gnu",
-    "videoId": "zz2a9Q2Wru0",
-    "ytTitle": "King Gnu - AIZO",
-    "category": "제이팝"
+    "title": "toxic till the end",
+    "artist": "ROSÉ (로제)",
+    "videoId": "saofySnR4z4",
+    "ytTitle": "로제 (ROSÉ) - toxic till the end [가사/Lyrics]",
+    "category": "한국"
   },
   {
-    "title": "あぶく",
-    "artist": "요루시카 (Yorushika)",
-    "videoId": "OHAjc-ayhus",
-    "ytTitle": "ヨルシカ - あぶく（OFFICIAL VIDEO）",
-    "category": "제이팝"
+    "title": "BOOMPALA",
+    "artist": "LE SSERAFIM",
+    "videoId": "Gnn4GRSzRXI",
+    "ytTitle": "LE SSERAFIM (르세라핌) 'BOOMPALA' OFFICIAL PERFORMANCE FILM",
+    "category": "한국"
+  },
+  {
+    "title": "HOME SWEET HOME",
+    "artist": "G-DRAGON",
+    "videoId": "fLi0EJfi_vg",
+    "ytTitle": "G-DRAGON - HOME SWEET HOME (Official Audio) (feat. TAEYANG & DAESUNG)",
+    "category": "한국"
+  },
+  {
+    "title": "like JENNIE",
+    "artist": "JENNIE (제니)",
+    "videoId": "XD00TJ-6WSw",
+    "ytTitle": "JENNIE - like JENNIE (Official Live Performance Video l NPOP LIMITED EDITION - SIDE A)",
+    "category": "한국"
+  },
+  {
+    "title": "FAMOUS",
+    "artist": "ALLDAY PROJECT",
+    "videoId": "VjvzYjU1mY0",
+    "ytTitle": "ALLDAY PROJECT - ‘FAMOUS’ M/V",
+    "category": "한국"
+  },
+  {
+    "title": "Seven",
+    "artist": "정국 (Jung Kook)",
+    "videoId": "1QYBiNRu1ok",
+    "ytTitle": "정국 (Jung Kook) 'Seven (feat. Latto)' Official Performance Video",
+    "category": "한국"
+  },
+  {
+    "title": "REBEL HEART",
+    "artist": "IVE (아이브)",
+    "videoId": "g36q0ZLvygQ",
+    "ytTitle": "IVE 아이브 'REBEL HEART' MV",
+    "category": "한국"
+  },
+  {
+    "title": "오늘만 I LOVE YOU",
+    "artist": "BOYNEXTDOOR",
+    "videoId": "rpsBmhqsbOk",
+    "ytTitle": "'최초 공개' BOYNEXTDOOR - 오늘만 I LOVE YOU #엠카운트다운 EP.870 | Mnet 250109 방송",
+    "category": "한국"
+  },
+  {
+    "title": "첫 만남은 계획대로 되지 않아",
+    "artist": "TWS (투어스)",
+    "videoId": "hVAc1Vf2ITU",
+    "ytTitle": "TWS (투어스) '첫 만남은 계획대로 되지 않아' Official MV",
+    "category": "한국"
+  },
+  {
+    "title": "SPAGHETTI",
+    "artist": "LE SSERAFIM",
+    "videoId": "TvVtYaqCni8",
+    "ytTitle": "LE SSERAFIM (르세라핌) 'SPAGHETTI (feat. j-hope of BTS)' OFFICIAL MV",
+    "category": "한국"
+  },
+  {
+    "title": "Whiplash",
+    "artist": "aespa",
+    "videoId": "jWQx2f-CErU",
+    "ytTitle": "aespa 에스파 'Whiplash' MV",
+    "category": "한국"
+  },
+  {
+    "title": "LIVE FAST DIE SLOW",
+    "artist": "태양 (TAEYANG)",
+    "videoId": "pB3W-k0kQ8U",
+    "ytTitle": "TAEYANG - ‘LIVE FAST DIE SLOW’ M/V",
+    "category": "한국"
   },
   {
     "title": "KIRA",
     "artist": "Ado",
     "videoId": "qpcz3-iDUP8",
     "ytTitle": "【Ado】綺羅（KIRA）",
+    "category": "제이팝"
+  },
+  {
+    "title": "あぶく",
+    "artist": "ヨルシカ (Yorushika)",
+    "videoId": "OHAjc-ayhus",
+    "ytTitle": "ヨルシカ - あぶく（OFFICIAL VIDEO）",
     "category": "제이팝"
   },
   {
@@ -98,24 +231,10 @@
     "category": "제이팝"
   },
   {
-    "title": "セレナーデ",
-    "artist": "natori",
-    "videoId": "gNg2Qw5R-Q4",
-    "ytTitle": "natori - Serenade",
-    "category": "제이팝"
-  },
-  {
-    "title": "火種",
-    "artist": "Tatsuya Kitani",
-    "videoId": "hA_9r-3jkSg",
-    "ytTitle": "火種 / キタニタツヤ - HIDANE (Dancing Ember) / Tatsuya Kitani",
-    "category": "제이팝"
-  },
-  {
-    "title": "飛ぶ時",
-    "artist": "Vaundy",
-    "videoId": "ARj1adoUoEU",
-    "ytTitle": "飛ぶ時 / Vaundy：MUSIC VIDEO",
+    "title": "AIZO",
+    "artist": "King Gnu",
+    "videoId": "zz2a9Q2Wru0",
+    "ytTitle": "King Gnu - AIZO",
     "category": "제이팝"
   },
   {
@@ -126,6 +245,167 @@
     "category": "제이팝"
   },
   {
+    "title": "セレナーデ",
+    "artist": "natori",
+    "videoId": "gNg2Qw5R-Q4",
+    "ytTitle": "natori - Serenade",
+    "category": "제이팝"
+  },
+  {
+    "title": "AiAiA",
+    "artist": "Ado",
+    "videoId": "_8CNByAq1n4",
+    "ytTitle": "【Ado】アイ・アイ・ア（AiAiA）",
+    "category": "제이팝"
+  },
+  {
+    "title": "火種",
+    "artist": "キタニタツヤ",
+    "videoId": "hA_9r-3jkSg",
+    "ytTitle": "火種 / キタニタツヤ - HIDANE (Dancing Ember) / Tatsuya Kitani",
+    "category": "제이팝"
+  },
+  {
+    "title": "ブレインロット",
+    "artist": "東京真中",
+    "videoId": "UsjsYMo3O1Q",
+    "ytTitle": "東京真中 -  ブレインロット feat. 重音テト",
+    "category": "제이팝"
+  },
+  {
+    "title": "ルミナス",
+    "artist": "Luminous",
+    "videoId": "SR1OfCAmTyI",
+    "ytTitle": "AiNA THE END / Luminous [Official Music Video] (TV Anime 'ONE PIECE' opening theme song)",
+    "category": "제이팝"
+  },
+  {
+    "title": "飛ぶ時",
+    "artist": "Vaundy",
+    "videoId": "ARj1adoUoEU",
+    "ytTitle": "飛ぶ時 / Vaundy：MUSIC VIDEO",
+    "category": "제이팝"
+  },
+  {
+    "title": "シャケナベイベー",
+    "artist": "AKASAKI",
+    "videoId": "WwI7hPXZC-Y",
+    "ytTitle": "【AKASAKI】シャケナベイベー / Shake Na Baby（TVアニメ『マリッジトキシン』Collab MV）",
+    "category": "제이팝"
+  },
+  {
+    "title": "TEST ME",
+    "artist": "ちゃんみな (CHANMINA)",
+    "videoId": "hQ4-H-nNNz4",
+    "ytTitle": "ちゃんみな - TEST ME (Official Music Video)",
+    "category": "제이팝"
+  },
+  {
+    "title": "The Story of Us",
+    "artist": "milet",
+    "videoId": "_1NbGbYG4qg",
+    "ytTitle": "milet「The Story of Us」MUSIC VIDEO (TVアニメ『葬送のフリーレン』第２期エンディングテーマ)",
+    "category": "제이팝"
+  },
+  {
+    "title": "Fright",
+    "artist": "Creepy Nuts",
+    "videoId": "R-fB7jypYGo",
+    "ytTitle": "【MV】Creepy Nuts - Fright",
+    "category": "제이팝"
+  },
+  {
+    "title": "アドレナ",
+    "artist": "YOASOBI",
+    "videoId": "ARqP5ohiubY",
+    "ytTitle": "YOASOBI「アドレナ」Official Music Video",
+    "category": "제이팝"
+  },
+  {
+    "title": "飛ぼうよ",
+    "artist": "yama",
+    "videoId": "8uRMfPTAhkU",
+    "ytTitle": "yama『飛ぼうよ』Music Video",
+    "category": "제이팝"
+  },
+  {
+    "title": "イデアが溢れて眠れない",
+    "artist": "Vaundy",
+    "videoId": "0u_zA8BJG6A",
+    "ytTitle": "イデアが溢れて眠れない / Vaundy：MUSIC VIDEO",
+    "category": "제이팝"
+  },
+  {
+    "title": "よあけのうた",
+    "artist": "jo0ji",
+    "videoId": "ufcDIOS1HRo",
+    "ytTitle": "jo0ji「よあけのうた」Official Music Video | TVアニメ『呪術廻戦』「死滅回游 前編」エンディングテーマ",
+    "category": "제이팝"
+  },
+  {
+    "title": "パッパパラダイス",
+    "artist": "宇多田ヒカル",
+    "videoId": "O5JN8l4pgOo",
+    "ytTitle": "宇多田ヒカル　「パッパパラダイス」 Music Video",
+    "category": "제이팝"
+  },
+  {
+    "title": "メガネを外して",
+    "artist": "乃紫",
+    "videoId": "XOKQluw_YLU",
+    "ytTitle": "乃紫 (noa) - メガネを外して【Official Music Video】",
+    "category": "제이팝"
+  },
+  {
+    "title": "Bad Girl",
+    "artist": "HANA",
+    "videoId": "xoBdZngf5Hs",
+    "ytTitle": "HANA / Bad Girl -Performance Video-",
+    "category": "제이팝"
+  },
+  {
+    "title": "革命道中",
+    "artist": "AiNA THE END",
+    "videoId": "NLIGDjKBLY0",
+    "ytTitle": "アイナ・ジ・エンド / 革命道中 - On The Way [Official Music Video]（TVアニメ『ダンダダン』第2期オープニングテーマ）",
+    "category": "제이팝"
+  },
+  {
+    "title": "One Two Three",
+    "artist": "Penthouse",
+    "videoId": "m4yCXpCiXpk",
+    "ytTitle": "Penthouse - 一二三［Official Music Video］",
+    "category": "제이팝"
+  },
+  {
+    "title": "JANE DOE",
+    "artist": "米津玄師, 宇多田ヒカル",
+    "videoId": "sPLqsLsooJY",
+    "ytTitle": "米津玄師, 宇多田ヒカル Kenshi Yonezu, Hikaru Utada -  JANE DOE",
+    "category": "제이팝"
+  },
+  {
+    "title": "ラストダンスあなたと",
+    "artist": "MISIA",
+    "videoId": "m4UuJWVt4Zc",
+    "ytTitle": "MISIA - ラストダンスあなたと (Official Music Video)",
+    "category": "제이팝"
+  },
+  {
+    "title": "TOKYO DRIFT",
+    "artist": "ONE OR EIGHT",
+    "videoId": "Qcz-7evvAqY",
+    "ytTitle": "ONE OR EIGHT / TOKYO DRIFT (Music Video)",
+    "category": "제이팝"
+  },
+  {
+    "title": "アイドル",
+    "artist": "YOASOBI",
+    "videoId": "ZRtdQ81jPUQ",
+    "ytTitle": "YOASOBI「アイドル」 Official Music Video",
+    "category": "제이팝"
+  },
+  {
     "title": "Janice STFU",
     "artist": "Drake",
     "videoId": "SD4yRDY9mek",
@@ -133,24 +413,45 @@
     "category": "팝"
   },
   {
-    "title": "Choosin' Texas",
+    "title": "Pretender",
+    "artist": "Official髭男dism",
+    "videoId": "TQ8WlA2GXbk",
+    "ytTitle": "Official髭男dism - Pretender［Official Video］",
+    "category": "제이팝"
+  },
+  {
+    "title": "KICK BACK",
+    "artist": "米津玄師",
+    "videoId": "M2cckDmNLMI",
+    "ytTitle": "米津玄師 Kenshi Yonezu - KICKBACK",
+    "category": "제이팝"
+  },
+  {
+    "title": "Choosin Texas",
     "artist": "Ella Langley",
     "videoId": "nUsrYVxrDwI",
     "ytTitle": "Ella Langley - Choosin' Texas (Official Video)",
     "category": "팝"
   },
   {
-    "title": "The Cure",
-    "artist": "Olivia Rodrigo",
-    "videoId": "B402rKl4bUg",
-    "ytTitle": "Olivia Rodrigo - the cure (Official Music Video)",
+    "title": "Shabang",
+    "artist": "Drake",
+    "videoId": "MoR47PedfaU",
+    "ytTitle": "Drake - shabang",
     "category": "팝"
   },
   {
-    "title": "So Easy (To Fall In Love)",
-    "artist": "Olivia Dean",
-    "videoId": "3sur4BmjQt8",
-    "ytTitle": "Olivia Dean - So Easy (To Fall In Love)",
+    "title": "Be Her",
+    "artist": "Ella Langley",
+    "videoId": "Dg47eNL_Usw",
+    "ytTitle": "Ella Langley - Be Her (Official Video)",
+    "category": "팝"
+  },
+  {
+    "title": "The Cure",
+    "artist": "Olivia Rodrigo",
+    "videoId": "LJTZXZWxEAY",
+    "ytTitle": "Olivia Rodrigo - the cure in the Live Lounge",
     "category": "팝"
   },
   {
@@ -168,6 +469,13 @@
     "category": "팝"
   },
   {
+    "title": "So Easy To Fall In Love",
+    "artist": "Olivia Dean",
+    "videoId": "3sur4BmjQt8",
+    "ytTitle": "Olivia Dean - So Easy (To Fall In Love)",
+    "category": "팝"
+  },
+  {
     "title": "Drop Dead",
     "artist": "Olivia Rodrigo",
     "videoId": "78wrful9cVU",
@@ -176,30 +484,177 @@
   },
   {
     "title": "Dracula",
-    "artist": "Tame Impala & JENNIE",
+    "artist": "Tame Impala, JENNIE",
     "videoId": "0UPDBODtxzw",
     "ytTitle": "Tame Impala, JENNIE - Dracula (JENNIE Remix - Official Lyric Video)",
     "category": "팝"
   },
   {
-    "title": "사랑하게 될 거야",
-    "artist": "한로로",
-    "videoId": "h0KIWaUEIgQ",
-    "ytTitle": "[MV] 한로로 (HANRORO) - 사랑하게 될 거야 (Landing in Love)",
-    "category": "발라드"
+    "title": "I Cant Love You Anymore",
+    "artist": "Ella Langley, Morgan Wallen",
+    "videoId": "A3G_7XgK2B4",
+    "ytTitle": "Ella Langley & Morgan Wallen - I Can’t Love You Anymore (Official Lyric Video)",
+    "category": "팝"
   },
   {
-    "title": "타임캡슐",
-    "artist": "다비치",
-    "videoId": "qE35JN1ogeI",
-    "ytTitle": "다비치 (DAVICHI) '타임캡슐' Official Music Video",
+    "title": "Manchild",
+    "artist": "Sabrina Carpenter",
+    "videoId": "aSugSGCC12I",
+    "ytTitle": "Sabrina Carpenter - Manchild (Official Video)",
+    "category": "팝"
+  },
+  {
+    "title": "APT",
+    "artist": "ROSÉ, Bruno Mars",
+    "videoId": "ekr2nIex040",
+    "ytTitle": "ROSÉ & Bruno Mars - APT. (Official Music Video)",
+    "category": "팝"
+  },
+  {
+    "title": "Die With A Smile",
+    "artist": "Lady Gaga, Bruno Mars",
+    "videoId": "kPa7bsKwL-c",
+    "ytTitle": "Lady Gaga, Bruno Mars - Die With A Smile (Official Music Video)",
+    "category": "팝"
+  },
+  {
+    "title": "BIRDS OF A FEATHER",
+    "artist": "Billie Eilish",
+    "videoId": "V9PVRfjEBTI",
+    "ytTitle": "Billie Eilish - BIRDS OF A FEATHER (Official Music Video)",
+    "category": "팝"
+  },
+  {
+    "title": "Timeless",
+    "artist": "The Weeknd, Playboi Carti",
+    "videoId": "5EpyN_6dqyk",
+    "ytTitle": "The Weeknd, Playboi Carti - Timeless",
+    "category": "팝"
+  },
+  {
+    "title": "luther",
+    "artist": "Kendrick Lamar, SZA",
+    "videoId": "sNY_2TEmzho",
+    "ytTitle": "Kendrick Lamar, SZA - luther",
+    "category": "팝"
+  },
+  {
+    "title": "Pink Pony Club",
+    "artist": "Chappell Roan",
+    "videoId": "GR3Liudev18",
+    "ytTitle": "Chappell Roan - Pink Pony Club (Official Music Video)",
+    "category": "팝"
+  },
+  {
+    "title": "Abracadabra",
+    "artist": "Lady Gaga",
+    "videoId": "vBynw9Isr28",
+    "ytTitle": "Lady Gaga - Abracadabra (Official Music Video)",
+    "category": "팝"
+  },
+  {
+    "title": "That's So True",
+    "artist": "Gracie Abrams",
+    "videoId": "4I5IXYSiBDo",
+    "ytTitle": "2024년 마지막을 함께했던 그 노래 📆 : 𝐆𝐫𝐚𝐜𝐢𝐞 𝐀𝐛𝐫𝐚𝐦𝐬 - 𝐓𝐡𝐚𝐭’𝐬 𝐒𝐨 𝐓𝐫𝐮𝐞 [가사/해석/lyrics]",
+    "category": "팝"
+  },
+  {
+    "title": "I Had Some Help",
+    "artist": "Post Malone, Morgan Wallen",
+    "videoId": "4QIZE708gJ4",
+    "ytTitle": "Post Malone - I Had Some Help (feat. Morgan Wallen) (Official Video)",
+    "category": "팝"
+  },
+  {
+    "title": "Lose Control",
+    "artist": "Teddy Swims",
+    "videoId": "GZ3zL7kT6_c",
+    "ytTitle": "Teddy Swims - Lose Control (Live)",
+    "category": "팝"
+  },
+  {
+    "title": "Beautiful Things",
+    "artist": "Benson Boone",
+    "videoId": "Oa_RSwwpPaA",
+    "ytTitle": "Benson Boone - Beautiful Things (Official Music Video)",
+    "category": "팝"
+  },
+  {
+    "title": "Too Sweet",
+    "artist": "Hozier",
+    "videoId": "aezstCBHOPQ",
+    "ytTitle": "Hozier - Too Sweet (Official Lyric Video)",
+    "category": "팝"
+  },
+  {
+    "title": "Please Please Please",
+    "artist": "Sabrina Carpenter",
+    "videoId": "cF1Na4AIecM",
+    "ytTitle": "Sabrina Carpenter - Please Please Please",
+    "category": "팝"
+  },
+  {
+    "title": "Anxiety",
+    "artist": "Doechii",
+    "videoId": "riCP9x31Kuk",
+    "ytTitle": "Doechii - Anxiety",
+    "category": "팝"
+  },
+  {
+    "title": "Ordinary",
+    "artist": "Alex Warren",
+    "videoId": "u2ah9tWTkmk",
+    "ytTitle": "Alex Warren - Ordinary (Official Video)",
+    "category": "팝"
+  },
+  {
+    "title": "I'm The Problem",
+    "artist": "Morgan Wallen",
+    "videoId": "HwThuMZ80RA",
+    "ytTitle": "Morgan Wallen - I’m The Problem (The Shop Sessions)",
+    "category": "팝"
+  },
+  {
+    "title": "Cry For Me",
+    "artist": "The Weeknd",
+    "videoId": "ljxYE-aJD3A",
+    "ytTitle": "The Weeknd - Cry For Me (Audio)",
+    "category": "팝"
+  },
+  {
+    "title": "Messy",
+    "artist": "Lola Young",
+    "videoId": "k-k2_Liofy8",
+    "ytTitle": "Lola Young - Messy (Official Video)",
+    "category": "팝"
+  },
+  {
+    "title": "0+0",
+    "artist": "한로로",
+    "videoId": "_Ngk-DCHfD0",
+    "ytTitle": "[MV] 한로로 (HANRORO) - 0+0",
     "category": "발라드"
   },
   {
     "title": "너에게 닿기를",
     "artist": "10CM",
-    "videoId": "Ry1RrIVyl1M",
-    "ytTitle": "[MV] 10CM _ To Reach You(너에게 닿기를)",
+    "videoId": "9_Safk5Si8Q",
+    "ytTitle": "너에게 닿기를 - 10CM (십센치) [뮤직뱅크/Music Bank] | KBS 250509 방송",
+    "category": "발라드"
+  },
+  {
+    "title": "사랑하게 될 거야",
+    "artist": "한로로",
+    "videoId": "f1sr0D13wEY",
+    "ytTitle": "🔗한로로 - 사랑하게 될 거야ㅣ잔나비 ➡ 한로로ㅣ#라이브와이어 3화 | Mnet 250704 방송",
+    "category": "발라드"
+  },
+  {
+    "title": "타임캡슐",
+    "artist": "다비치",
+    "videoId": "0Pey6Y-xogE",
+    "ytTitle": "DAVICHI (다비치) - 타임캡슐 (TIME CAPSULE) [가사]",
     "category": "발라드"
   },
   {
@@ -210,10 +665,17 @@
     "category": "발라드"
   },
   {
+    "title": "멸종위기사랑",
+    "artist": "이찬혁",
+    "videoId": "G5mbcsDvKo8",
+    "ytTitle": "이찬혁 - 멸종위기사랑 [가사 | Lyrics]",
+    "category": "발라드"
+  },
+  {
     "title": "너의 모든 순간",
     "artist": "성시경",
-    "videoId": "evOsUf9en-Y",
-    "ytTitle": "너의 모든 순간 - 성시경 / 가사",
+    "videoId": "i2aRMXZR1k0",
+    "ytTitle": "성시경 - 너의 모든 순간 [유희열의 스케치북/You Heeyeol’s Sketchbook] | KBS 210528 방송",
     "category": "발라드"
   },
   {
@@ -224,31 +686,185 @@
     "category": "발라드"
   },
   {
-    "title": "0+0",
+    "title": "내게 사랑이 뭐냐고 물어본다면",
+    "artist": "로이킴",
+    "videoId": "5ly8tAU-n_w",
+    "ytTitle": "로이킴 (Roy Kim) - 내게 사랑이 뭐냐고 물어본다면 (If You Ask Me What Love Is) MV",
+    "category": "발라드"
+  },
+  {
+    "title": "소나기",
+    "artist": "ECLIPSE (이클립스)",
+    "videoId": "MQMzMgqcuKk",
+    "ytTitle": "이클립스 (ECLIPSE) - 소나기 [선재 업고 튀어 OST] [가사/Lyrics]",
+    "category": "발라드"
+  },
+  {
+    "title": "천상연",
+    "artist": "이창섭",
+    "videoId": "fQ84rvbfa08",
+    "ytTitle": "[LIVE] 이창섭 - 천상연 (선녀외전 OST) 라이브 (Full. ver)",
+    "category": "발라드"
+  },
+  {
+    "title": "모르시나요",
+    "artist": "조째즈",
+    "videoId": "tfmwbxBKPh0",
+    "ytTitle": "[MV] ZO ZAZZ(조째즈) _ Don`t you know(PROD.ROCOBERRY)(모르시나요(PROD.로코베리))",
+    "category": "발라드"
+  },
+  {
+    "title": "모든 날, 모든 순간",
+    "artist": "폴킴",
+    "videoId": "nq0BYGyH2Do",
+    "ytTitle": "폴킴(Paul Kim) - 모든 날, 모든 순간 (Every day, Every Moment) [키스 먼저 할까요? OST] [가사/Lyrics]",
+    "category": "발라드"
+  },
+  {
+    "title": "주저하는 연인들을 위해",
+    "artist": "잔나비",
+    "videoId": "GpQ222I1ULc",
+    "ytTitle": "잔나비[JANNABI] - '주저하는 연인들을 위해' Official M/V",
+    "category": "발라드"
+  },
+  {
+    "title": "사랑인가 봐",
+    "artist": "멜로망스",
+    "videoId": "McidaTgrQB0",
+    "ytTitle": "멜로망스(Melomance) - 사랑인가 봐 [사내맞선 OST] [가사/Lyrics]",
+    "category": "발라드"
+  },
+  {
+    "title": "나는 반딧불",
+    "artist": "황가람",
+    "videoId": "3Y6ut1g-K0g",
+    "ytTitle": "황가람 - 나는 반딧불 [열린 음악회/Open Concert] | KBS 250427 방송",
+    "category": "발라드"
+  },
+  {
+    "title": "청혼하지 않을 이유를 못 찾았어",
+    "artist": "이무진",
+    "videoId": "cpZAJoDh0Yo",
+    "ytTitle": "청혼하지 않을 이유를 못 찾았어 - 이무진 [더 시즌즈-지코의 아티스트] | KBS 240503 방송",
+    "category": "발라드"
+  },
+  {
+    "title": "사랑은 봄비처럼 이별은 겨울비처럼",
+    "artist": "임현정",
+    "videoId": "oHReHugZd6Y",
+    "ytTitle": "임현정 - 사랑은 봄비처럼 이별은 겨울비처럼 (2003년)",
+    "category": "발라드"
+  },
+  {
+    "title": "눈을 감아도",
+    "artist": "순순희 (지환)",
+    "videoId": "lju9zsUAHTs",
+    "ytTitle": "[풀버전M/V] 순순희(지환) - 눈을 감아도(2026)",
+    "category": "발라드"
+  },
+  {
+    "title": "입춘",
     "artist": "한로로",
-    "videoId": "_Ngk-DCHfD0",
-    "ytTitle": "[MV] 한로로 (HANRORO) - 0+0",
+    "videoId": "pNi9PjmbUrI",
+    "ytTitle": "[MV] 한로로 (HANRORO) - 입춘 (Let Me Love My Youth)",
     "category": "발라드"
   },
   {
-    "title": "멸종위기사랑",
-    "artist": "이찬혁",
-    "videoId": "19oT04OuBhg",
-    "ytTitle": "이찬혁 (LEE CHANHYUK) - '멸종위기사랑' M/V",
+    "title": "다정히 내 이름을 부르면",
+    "artist": "경서예지, 전건호",
+    "videoId": "b_6EfFZyBxY",
+    "ytTitle": "경서예지 X 전건호 - 다정히 내 이름을 부르면 / 가사",
     "category": "발라드"
   },
   {
-    "title": "이제 나만 믿어요",
-    "artist": "임영웅",
-    "videoId": "U3Sgf0iYIow",
-    "ytTitle": "임영웅 [이제나만믿어요] 2020트롯어워즈 (ENG)",
+    "title": "Love wins all",
+    "artist": "아이유 (IU)",
+    "videoId": "ax1csKKQnns",
+    "ytTitle": "IU 'Love wins all' Live Clip (2024 IU HEREH WORLD TOUR CONCERT IN SEOUL)",
+    "category": "발라드"
+  },
+  {
+    "title": "봄 내음보다 너를",
+    "artist": "김나영",
+    "videoId": "fO36kiw-bUE",
+    "ytTitle": "김나영 - 봄 내음보다 너를 / 가사",
+    "category": "발라드"
+  },
+  {
+    "title": "그대만 있다면",
+    "artist": "너드커넥션",
+    "videoId": "fPJAxY6OtGM",
+    "ytTitle": "너드커넥션 (Nerd Connection) - 그대만 있다면 (여름날 우리 X 너드커넥션) [더 시즌즈-이영지의 레인보우] | KBS 241004 방송",
+    "category": "발라드"
+  },
+  {
+    "title": "청춘만화",
+    "artist": "이무진",
+    "videoId": "qLJq2muxhWc",
+    "ytTitle": "이무진 (LEE MU JIN) - '청춘만화' Live Clip",
+    "category": "발라드"
+  },
+  {
+    "title": "한 페이지가 될 수 있게",
+    "artist": "DAY6 (데이식스)",
+    "videoId": "vnS_jn2uibs",
+    "ytTitle": "DAY6 \"Time of Our Life(한 페이지가 될 수 있게)\" M/V",
+    "category": "발라드"
+  },
+  {
+    "title": "예뻤어",
+    "artist": "DAY6 (데이식스)",
+    "videoId": "Ejc__vhP2U8",
+    "ytTitle": "DAY6(데이식스)- 예뻤어 [가사/Lyrics]",
+    "category": "발라드"
+  },
+  {
+    "title": "시작의 아이",
+    "artist": "박다혜, 마크툽 (MAKTUB)",
+    "videoId": "aA9D4tJcAm4",
+    "ytTitle": "마크툽 (MAKTUB)-시작의 아이 ∞ (Duet. 박다혜)",
+    "category": "발라드"
+  },
+  {
+    "title": "달리 표현할 수 없어요",
+    "artist": "로이킴",
+    "videoId": "mR-kkHE0-tU",
+    "ytTitle": "로이킴 (Roy Kim) - 달리 표현할 수 없어요 (No Words Can Say) Music Video",
+    "category": "발라드"
+  },
+  {
+    "title": "울고있네요",
+    "artist": "혜원이",
+    "videoId": "z05W-FU3XxE",
+    "ytTitle": "울고있네요",
     "category": "트로트"
+  },
+  {
+    "title": "사랑아",
+    "artist": "정희",
+    "videoId": "v3F04LNveUY",
+    "ytTitle": "[트로트][World] 정희(Jung Hee) - 사랑아(LOVE) [Various K-Pop]",
+    "category": "트로트"
+  },
+  {
+    "title": "HAPPY",
+    "artist": "DAY6 (데이식스)",
+    "videoId": "VXp2dCXYrvQ",
+    "ytTitle": "DAY6 (데이식스) - HAPPY [가사/Lyrics]",
+    "category": "발라드"
   },
   {
     "title": "초혼",
     "artist": "장윤정",
-    "videoId": "RD0sx4ouiGI",
-    "ytTitle": "이게 진짜 장윤정-초혼 뮤직비디오.wmv",
+    "videoId": "FFl0k_XTvc4",
+    "ytTitle": "장윤정 - 초혼 [열린 음악회/Open Concert] | KBS 220515 방송",
+    "category": "트로트"
+  },
+  {
+    "title": "이제 나만 믿어요",
+    "artist": "임영웅",
+    "videoId": "kSzraUekkNE",
+    "ytTitle": "[MV] 임영웅 - 이제 나만 믿어요 full.ver",
     "category": "트로트"
   },
   {
@@ -259,17 +875,45 @@
     "category": "트로트"
   },
   {
-    "title": "목포행 완행열차",
+    "title": "사랑아",
     "artist": "장윤정",
-    "videoId": "hW-JvMmD_wQ",
-    "ytTitle": "장윤정 목포행 완행열차 가사",
+    "videoId": "bxUNwfA9HKM",
+    "ytTitle": "장윤정 사랑아 (가사 첨부)",
+    "category": "트로트"
+  },
+  {
+    "title": "우리 오빠야",
+    "artist": "이지 (EZ)",
+    "videoId": "-e1lhyiBWAA",
+    "ytTitle": "[MV] 이지(EZ) - 우리 오빠야",
     "category": "트로트"
   },
   {
     "title": "안동역에서",
     "artist": "진성",
-    "videoId": "-kpve_FSzc4",
-    "ytTitle": "안동역에서",
+    "videoId": "w5j1-8Dmew0",
+    "ytTitle": "진성 - 안동역에서 (가요베스트 606회 고흥1부) 우영우 정명석 변호사가 부른 노래 '진성 안동역에서' 원곡 Jin Sung",
+    "category": "트로트"
+  },
+  {
+    "title": "목포행 완행열차",
+    "artist": "장윤정",
+    "videoId": "89yRoGEnlEQ",
+    "ytTitle": "미스트롯들의 ★LOL모델★ 장윤정 ‘목포행 완행열차’♩ [내일은 미스트롯] 9회 20190425",
+    "category": "트로트"
+  },
+  {
+    "title": "정답 없는 인생",
+    "artist": "명호",
+    "videoId": "qpWlmwEL7-o",
+    "ytTitle": "정답없는 인생 / 명호 [작사 태욱,송명구 / 작곡 태욱 / 2025 신곡]",
+    "category": "트로트"
+  },
+  {
+    "title": "사랑 참",
+    "artist": "장윤정",
+    "videoId": "MNTzt1SJADA",
+    "ytTitle": "사랑 참",
     "category": "트로트"
   },
   {
@@ -280,10 +924,122 @@
     "category": "트로트"
   },
   {
+    "title": "평행선",
+    "artist": "문희옥",
+    "videoId": "1pb7KPqGRI8",
+    "ytTitle": "[문희옥 평행선 1시간 연속듣기] 말해 뭐해~ 일단 틀면, 중독된다! l JTV전주방송",
+    "category": "트로트"
+  },
+  {
     "title": "니가 왜 거기서 나와",
     "artist": "영탁",
-    "videoId": "88a2RgUjRKk",
-    "ytTitle": "[MV] Youngtak(영탁) _ 니가 왜 거기서 나와",
+    "videoId": "_-6W_DGAEsE",
+    "ytTitle": "영탁, 니가 왜 거기서 나와 [2021 나눔 음악회 | Sharing Concert]",
+    "category": "트로트"
+  },
+  {
+    "title": "오늘 밤에",
+    "artist": "홍진영",
+    "videoId": "5zONW_hyI5A",
+    "ytTitle": "[MV] HONG JINYOUNG(홍진영) _ Love Tonight(오늘 밤에)",
+    "category": "트로트"
+  },
+  {
+    "title": "우리에게 안녕",
+    "artist": "임영웅",
+    "videoId": "ylTuLv9iDmY",
+    "ytTitle": "임영웅 - 우리에게 안녕",
+    "category": "트로트"
+  },
+  {
+    "title": "찐이야",
+    "artist": "영탁",
+    "videoId": "QMjkrcmo21Y",
+    "ytTitle": "✦탁마에의 탄생✧ 엄지 척乃 영탁 ‘찐이야’♬ [내일은 미스터트롯] 11회 20200312",
+    "category": "트로트"
+  },
+  {
+    "title": "거짓말",
+    "artist": "조항조",
+    "videoId": "wqepLWLbT0k",
+    "ytTitle": "거짓말",
+    "category": "트로트"
+  },
+  {
+    "title": "다시 사랑한다면",
+    "artist": "임영웅",
+    "videoId": "rjlOvKoVubQ",
+    "ytTitle": "【클린버전】 임영웅 - 다시 사랑한다면 💙사랑의 콜센타 56화💙 TV CHOSUN 210520 방송",
+    "category": "트로트"
+  },
+  {
+    "title": "테스형!",
+    "artist": "나훈아",
+    "videoId": "8cNz9awcVqg",
+    "ytTitle": "나훈아 2020 대한민국 어게인 ‘테스형!’",
+    "category": "트로트"
+  },
+  {
+    "title": "어느 60대 노부부 이야기",
+    "artist": "임영웅",
+    "videoId": "cKp4W5Iu95Q",
+    "ytTitle": "임영웅 ‘어느 60대 노부부 이야기’♩ 첫 소절에 찡≋ [내일은 미스터트롯] 8회 20200220",
+    "category": "트로트"
+  },
+  {
+    "title": "아모르 파티",
+    "artist": "김연자",
+    "videoId": "OzAZIxkBZso",
+    "ytTitle": "KBS가요대축제 - 김연자 X 전 출연자가 함께 아모르 파티★ 20181228",
+    "category": "트로트"
+  },
+  {
+    "title": "막걸리 한잔",
+    "artist": "영탁",
+    "videoId": "npXaoOA2yS0",
+    "ytTitle": "영탁 ‘막걸리 한잔’♭ 모두 막걸리 열풍! 일.동.원.샷 [내일은 미스터트롯] 4회 20200123",
+    "category": "트로트"
+  },
+  {
+    "title": "보릿고개",
+    "artist": "진성",
+    "videoId": "0lEGY9b3eiI",
+    "ytTitle": "진성 - 보릿고개 [가요무대/Music Stage] | KBS 230828 방송",
+    "category": "트로트"
+  },
+  {
+    "title": "남자라는 이유로",
+    "artist": "조항조",
+    "videoId": "HutJA-zZGCM",
+    "ytTitle": "조항조 - 남자라는 이유로 [가요무대/Music Stage] | KBS 210426 방송",
+    "category": "트로트"
+  },
+  {
+    "title": "한 많은 대동강",
+    "artist": "송가인",
+    "videoId": "YC11pDYESs8",
+    "ytTitle": "【클린버전】 송가인 - 한 많은 대동강 ❤화요일은 밤이 좋아 54화 ❤ TV CHOSUN 230103 방송",
+    "category": "트로트"
+  },
+  {
+    "title": "진또배기",
+    "artist": "이찬원",
+    "videoId": "LCEyhP6y98o",
+    "ytTitle": "이찬원 [진또배기] 미스터트롯",
+    "category": "트로트"
+  },
+  {
+    "title": "오라버니",
+    "artist": "금잔디",
+    "videoId": "CusFi4cJfT4",
+    "ytTitle": "애교 만점🧡 금잔디 ‘오라버니’♪ 최고최고👍 | [2020 트롯 어워즈 1부]  | TV CHOSUN 20201001 방송",
+    "category": "트로트"
+  },
+  {
+    "title": "녹아 버려요",
+    "artist": "박지현",
+    "videoId": "xE2espkOpws",
+    "ytTitle": "녹아 버려요 - 박지현 (Park Ji Hyeon) [뮤직뱅크/Music Bank] | KBS 250704 방송",
     "category": "트로트"
   }
 ]
