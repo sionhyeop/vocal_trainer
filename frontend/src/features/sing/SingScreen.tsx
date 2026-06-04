@@ -18,6 +18,7 @@ import { MelodyScorer } from '../../audio/melodyScorer'
 import type { Judgment } from '../../lib/score'
 import type { NoteMap } from '../../lib/noteMap'
 import { loadNoteMap, saveNoteMap, deleteNoteMap } from '../../lib/noteMapStore'
+import { lyricBridgeNotes } from '../../lib/contourToNoteMap'
 import { extractNoteMapFromOriginal, fetchExtractProgress, loadCachedNoteMap, type ExtractMethod, type ExtractProgress } from '../../lib/extractNoteMap'
 import { analyzeBreath, type SessionFrame, type BreathSummary } from '../../audio/breathAnalyzer'
 import { computeWeakSections, type WeakSection } from '../result/weakSections'
@@ -139,8 +140,12 @@ export default function SingScreen() {
   const frameCountRef = useRef(0)
   const countdownTimer = useRef<number | null>(null)
 
+  // 가사 매칭 보강을 곡당 1회만 적용하기 위한 가드
+  const lyricRefinedRef = useRef<string | null>(null)
+
   // videoId 바뀌면 저장된 노트맵 + 가사 오프셋 로드. 로컬에 없으면 서버 캐시(사전 추출 차트곡) 자동 로드
   useEffect(() => {
+    lyricRefinedRef.current = null
     const nm = loadNoteMap(videoId)
     setNoteMap(nm)
     const off = Number(localStorage.getItem(`lyricOffset:${videoId}`) || 0)
@@ -155,6 +160,16 @@ export default function SingScreen() {
     })
     return () => { alive = false }
   }, [videoId])
+
+  // ② 가사 매칭 보강 — 노트맵 + 싱크 가사가 모두 준비되면, 가사 줄 구조로 노트 연속성을 한 번 보강.
+  useEffect(() => {
+    if (!noteMap || lyrics.status !== 'ok' || lyrics.lines.length < 2) return
+    if (lyricRefinedRef.current === videoId) return // 곡당 1회
+    lyricRefinedRef.current = videoId
+    const notes = noteMap.notes.map((n) => ({ ...n }))
+    const refined = lyricBridgeNotes(notes, lyrics.lines.map((l) => l.time))
+    setNoteMap({ ...noteMap, notes: refined })
+  }, [noteMap, lyrics.status, lyrics.lines, videoId])
 
   const setOffset = useCallback(
     (v: number) => {

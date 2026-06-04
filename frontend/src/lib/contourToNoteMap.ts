@@ -12,6 +12,7 @@ export interface SegmentOptions {
   minNoteMs?: number // 이보다 짧은 노트는 버림
   maxGapMs?: number // 같은 음으로 이어붙일 최대 간격
   connectGapMs?: number // 인접 노트 사이 이 간격 이하면 끝을 늘려 빈틈 제거
+  deadbandSemi?: number // 히스테리시스: 현재 음에서 이만큼 벗어나야 음 전환(경계 떨림 방지)
 }
 
 // 이동평균으로 비브라토/순간 흔들림 완화
@@ -33,14 +34,21 @@ function smooth(values: number[], win: number): number[] {
 
 /** 정렬된 contour 샘플 → 노트 배열 */
 export function contourToNotes(samples: ContourSample[], opts: SegmentOptions = {}): Note[] {
-  // 기본값을 "끊김 최소화" 쪽으로: 짧은 노트도 살리고(minNoteMs↓), 같은 음 병합 폭↑,
-  // 빈틈 브릿지 임계↑(연속 피치). connectGapMs 이하 간격은 앞 음을 끌어 메운다.
-  const { smoothWindow = 5, minNoteMs = 60, maxGapMs = 120, connectGapMs = 1200 } = opts
+  // 기본값을 "끊김 최소화" 쪽으로: 강한 스무딩 + 히스테리시스 양자화로 경계 떨림 제거,
+  // 같은 음 병합 폭↑, 빈틈 브릿지 임계↑(연속 피치).
+  const { smoothWindow = 9, minNoteMs = 60, maxGapMs = 140, connectGapMs = 1400, deadbandSemi = 0.7 } = opts
   if (samples.length === 0) return []
 
   const sorted = [...samples].sort((a, b) => a.tMs - b.tMs)
   const smoothed = smooth(sorted.map((s) => s.midi), smoothWindow)
-  const q = smoothed.map((m) => Math.round(m)) // 반음 양자화
+  // 히스테리시스 양자화: 현재 음에서 deadband 이상 벗어날 때만 음을 바꿔, 반음 경계 근처의
+  // 프레임 단위 깜빡임(비브라토/미세 흔들림으로 60↔61 반복)을 없애 노트가 잘게 끊기지 않게 한다.
+  const q: number[] = []
+  let cur = Math.round(smoothed[0])
+  for (const m of smoothed) {
+    if (Math.abs(m - cur) >= deadbandSemi) cur = Math.round(m)
+    q.push(cur)
+  }
 
   const notes: Note[] = []
   let note = q[0]
@@ -86,6 +94,34 @@ export function bridgeGaps(notes: Note[], bridgeMs = 1200): Note[] {
   for (let i = 0; i < notes.length - 1; i++) {
     const gap = notes[i + 1].startMs - notes[i].endMs
     if (gap > 0 && gap <= bridgeMs) notes[i].endMs = notes[i + 1].startMs
+  }
+  return notes
+}
+
+/**
+ * 가사 매칭 보강 — 싱크 가사의 줄(line) 시작 시각으로 노트를 구조화한다.
+ *
+ * 한 가사 "줄"은 보통 한 호흡으로 이어 부르는 구절이다. 따라서:
+ *  - 노트 사이 간격이 *같은 줄 안*에 있으면 → 이어붙여 끊김 제거(긴 음의 추출 구멍 메움).
+ *  - 간격에 *줄 경계*가 끼어 있으면 → 줄이 바뀌는 호흡 지점이므로 쉼표로 보존.
+ *
+ * lineTimesSec: LRC 줄 시작 시각(초). notes[0].startMs ≈ 첫 보컬(≈첫 줄)로 보고 영상 시간에 정렬한다.
+ */
+export function lyricBridgeNotes(notes: Note[], lineTimesSec: number[], maxBridgeMs = 4000): Note[] {
+  if (notes.length < 2 || lineTimesSec.length < 2) return notes
+  const anchorMs = notes[0].startMs
+  const t0 = lineTimesSec[0]
+  // 가사 줄 시작을 영상 시간(ms)으로 환산
+  const lineMs = lineTimesSec.map((t) => anchorMs + (t - t0) * 1000)
+  const TOL = 400 // LRC 타이밍 오차 허용
+  for (let i = 0; i < notes.length - 1; i++) {
+    const gap = notes[i + 1].startMs - notes[i].endMs
+    if (gap <= 0 || gap > maxBridgeMs) continue
+    // 다음 노트가 '새 가사 줄의 시작'이면 그 직전 간격은 호흡 → 쉼표 유지.
+    // 아니면 같은 줄 안의 끊김 → 이어붙임.
+    const nextStart = notes[i + 1].startMs
+    const nextIsLineStart = lineMs.some((t) => Math.abs(t - nextStart) < TOL)
+    if (!nextIsLineStart) notes[i].endMs = nextStart
   }
   return notes
 }
