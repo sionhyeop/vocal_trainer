@@ -44,7 +44,10 @@ export default function HomePage() {
     const sessions = listSessions()
     const recent = sessions.slice(0, 6)
     const count = sessions.length
-    const avg = count ? Math.round(sessions.reduce((a, s) => a + s.score, 0) / count) : 0
+    // 점수 체계가 누적raw→100점 정확도로 바뀌기 전 옛 세션은 100 초과 점수가 남아있을 수 있어
+    // 각 점수를 0~100으로 클램프한 뒤 평균(100점 만점 평균이 100을 넘지 않게).
+    const clamp100 = (n: number) => Math.max(0, Math.min(100, n))
+    const avg = count ? Math.round(sessions.reduce((a, s) => a + clamp100(s.score), 0) / count) : 0
     const profile = getProfile()
     const range = profile ? `${midiToNoteName(profile.lowMidi)}~${midiToNoteName(profile.highMidi)}` : null
     return { recent, stats: { count, avg, range }, hasData: count > 0 || !!range }
@@ -129,7 +132,7 @@ export default function HomePage() {
             {recent.map((s) => (
               <button key={s.id} onClick={() => openSession(s)} className="lift" style={recentCard}>
                 <img src={`https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`} alt="" style={recentThumb} />
-                <span style={{ ...scoreBadge, background: scoreColor(s.score) }}>{s.score}점</span>
+                <span style={{ ...scoreBadge, background: scoreColor(Math.min(100, s.score)) }}>{Math.min(100, Math.max(0, Math.round(s.score)))}점</span>
                 <span style={recentTitle}>{s.title}</span>
                 <span style={recentDate}>{fmtDate(s.dateMs)}</span>
               </button>

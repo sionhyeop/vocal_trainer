@@ -19,17 +19,23 @@ export function pitchShiftBuffer(ctx: AudioContext, input: AudioBuffer, semitone
   const filter = new SimpleFilter(source, st)
   const BUF = 8192
   const inter = new Float32Array(BUF * 2)
-  const L: number[] = []
-  const R: number[] = []
+  // 샘플별 boxed-number push(수백만 개)는 긴 녹음에서 메인스레드를 멈춘다.
+  // extract 청크를 Float32Array로 복사해 모았다가 한 번에 디인터리브.
+  const chunks: Float32Array[] = []
+  let total = 0
   let n: number
   while ((n = filter.extract(inter, BUF)) > 0) {
-    for (let i = 0; i < n; i++) {
-      L.push(inter[i * 2])
-      R.push(inter[i * 2 + 1])
-    }
+    chunks.push(inter.slice(0, n * 2))
+    total += n
   }
-  const out = ctx.createBuffer(2, Math.max(1, L.length), input.sampleRate)
-  out.getChannelData(0).set(L)
-  out.getChannelData(1).set(R)
+  const out = ctx.createBuffer(2, Math.max(1, total), input.sampleRate)
+  const L = out.getChannelData(0)
+  const R = out.getChannelData(1)
+  let off = 0
+  for (const c of chunks) {
+    const frames = c.length / 2
+    for (let i = 0; i < frames; i++) { L[off + i] = c[i * 2]; R[off + i] = c[i * 2 + 1] }
+    off += frames
+  }
   return out
 }

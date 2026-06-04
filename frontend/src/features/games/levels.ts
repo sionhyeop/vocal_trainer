@@ -19,14 +19,14 @@ export interface BalladSong {
   melody: [number, number][]
 }
 
-// 날아오는 음 깨기 — 절차적 생성용 레벨 파라미터
+// 피아노 타일(음 깨기) — 세로 레인. lanes=각 레인 음정(낮→높), 타일이 위→아래로 떨어짐.
 export interface BreakerLevel {
   id: string
   name: string
-  scale: number[] // 음 풀(midi). 프로필 음역대로 이조됨
-  count: number // 음표 개수
-  gapMs: number // 음표 사이 간격(작을수록 빠르고 촘촘)
-  speedPxPerSec: number // 흐르는 속도
+  lanes: number[] // 레인(건반) 음정(midi) 낮→높. 프로필 음역대로 이조됨
+  count: number // 타일 개수
+  gapMs: number // 타일 사이 간격(클수록 완만)
+  speedPxPerSec: number // 떨어지는 속도(작을수록 완만)
   tolSemi: number // 허용 오차(반음)
 }
 
@@ -76,9 +76,10 @@ export const BALLADS: BalladSong[] = [
   },
 ]
 
+// 음을 낮고(C4=60 중심 아래로) 느리게 — 완만한 난이도. 옥타브 무관 채점이라 저음/고음 모두 OK.
 export const BREAKER_LEVELS: BreakerLevel[] = [
-  { id: 'k1', name: '입문 (느린 5음)', scale: [60, 62, 64, 65, 67], count: 12, gapMs: 1700, speedPxPerSec: 95, tolSemi: 1 },
-  { id: 'k2', name: '펜타토닉', scale: [60, 62, 64, 67, 69], count: 16, gapMs: 1400, speedPxPerSec: 115, tolSemi: 1 },
-  { id: 'k3', name: '한 옥타브', scale: [60, 62, 64, 65, 67, 69, 71, 72], count: 20, gapMs: 1200, speedPxPerSec: 135, tolSemi: 0.9 },
-  { id: 'k4', name: '도약 + 빠르게', scale: [60, 64, 67, 72, 69, 65, 62], count: 24, gapMs: 1000, speedPxPerSec: 160, tolSemi: 0.9 },
+  { id: 'k1', name: '입문 (3건반·느림)', lanes: [57, 60, 62], count: 12, gapMs: 1800, speedPxPerSec: 120, tolSemi: 1.3 },
+  { id: 'k2', name: '4건반', lanes: [55, 57, 60, 62], count: 16, gapMs: 1550, speedPxPerSec: 140, tolSemi: 1.2 },
+  { id: 'k3', name: '5건반', lanes: [53, 55, 57, 60, 62], count: 20, gapMs: 1350, speedPxPerSec: 160, tolSemi: 1.1 },
+  { id: 'k4', name: '6건반·조금 빠르게', lanes: [53, 55, 57, 59, 60, 62], count: 24, gapMs: 1200, speedPxPerSec: 180, tolSemi: 1 },
 ]

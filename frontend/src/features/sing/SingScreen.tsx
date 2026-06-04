@@ -12,7 +12,7 @@ import { useYouTubePlayer } from '../../hooks/useYouTubePlayer'
 import { useLyrics } from '../../hooks/useLyrics'
 import { useMicPitch, type PitchFrame } from '../../hooks/useMicPitch'
 import ExtractRequest from './ExtractRequest'
-import { pitchShiftBuffer } from '../../lib/pitchShift'
+import VoicePlayer from './VoicePlayer'
 import type { ScoreState } from '../../audio/scorer'
 import { MelodyScorer } from '../../audio/melodyScorer'
 import type { Judgment } from '../../lib/score'
@@ -128,11 +128,9 @@ export default function SingScreen() {
   const recordEnabledRef = useRef(true)
   recordEnabledRef.current = recordEnabled
   const [recordedBuf, setRecordedBuf] = useState<AudioBuffer | null>(null)
-  const [voiceShift, setVoiceShift] = useState(0) // 내 목소리 변조량(반음, 0.5 단위)
   const recorderRef = useRef<MediaRecorder | null>(null)
   const recChunksRef = useRef<Blob[]>([])
   const recCtxRef = useRef<AudioContext | null>(null)
-  const recSrcRef = useRef<AudioBufferSourceNode | null>(null)
   const [count, setCount] = useState(3)
   const [rms, setRms] = useState(0)
   const [hud, setHud] = useState<{ score: number; combo: number; judgment: Judgment | null; key: number }>(
@@ -273,27 +271,6 @@ export default function SingScreen() {
     recorderRef.current = null
   }, [])
 
-  // 녹음된 내 목소리를 semis 반음 이동해 재생(0=원음)
-  const playMyVoice = useCallback(async (semis: number) => {
-    if (!recordedBuf) return
-    const ctx = (recCtxRef.current ??= new AudioContext())
-    await ctx.resume()
-    try { recSrcRef.current?.stop() } catch { /* noop */ }
-    const out = semis === 0 ? recordedBuf : pitchShiftBuffer(ctx, recordedBuf, semis)
-    const src = ctx.createBufferSource()
-    src.buffer = out
-    src.connect(ctx.destination)
-    src.start()
-    recSrcRef.current = src
-  }, [recordedBuf])
-
-  // 변조량을 0.5반음씩 조절하고 그 음정으로 바로 들려준다(미리듣기). 범위 ±7반음.
-  const adjustVoiceShift = useCallback((delta: number) => {
-    const v = Math.max(-7, Math.min(7, Math.round((voiceShift + delta) * 2) / 2))
-    setVoiceShift(v)
-    playMyVoice(v)
-  }, [voiceShift, playMyVoice])
-
   // 캔버스 사이즈
   useEffect(() => {
     const c = canvasRef.current
@@ -430,7 +407,6 @@ export default function SingScreen() {
   const onRetry = useCallback(() => {
     historyRef.current = []
     drawMelodyRibbon(canvasRef.current, historyRef.current, [], 0)
-    try { recSrcRef.current?.stop() } catch { /* noop */ }
     setRecordedBuf(null)
     setPhase('idle')
     setHud({ score: 0, combo: 0, judgment: null, key: 0 })
@@ -699,33 +675,8 @@ export default function SingScreen() {
         />
       )}
 
-      {/* 🎙 내 목소리 다시듣기 · 음정 변조 (자동 녹음분) */}
-      {phase === 'done' && recordedBuf && (
-        <div style={{ border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-sm) var(--space-md)', marginTop: 'var(--space-sm)' }}>
-          <div style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--space-xs)' }}>🎙 내 목소리 다시듣기 · 음정 바꿔듣기</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', flexWrap: 'wrap' }}>
-            {/* 0.5반음 스테퍼: −/+ 누르면 그 음정으로 바로 들려준다 */}
-            <button onClick={() => adjustVoiceShift(-0.5)} disabled={voiceShift <= -7} style={stepBtn} aria-label="반음 0.5 낮추기">−</button>
-            <div style={{
-              minWidth: 96, textAlign: 'center', padding: 'var(--space-xs) var(--space-sm)',
-              borderRadius: 'var(--radius-lg)', border: `var(--border-width) solid ${voiceShift === 0 ? 'var(--color-border)' : 'var(--color-fox)'}`,
-              background: voiceShift === 0 ? 'var(--color-bg)' : 'var(--color-fox)',
-              color: voiceShift === 0 ? 'var(--color-text)' : 'var(--color-text-inverse)',
-              fontWeight: 'var(--font-weight-heavy)', fontSize: 'var(--font-size-body)',
-            }}>
-              {voiceShift === 0 ? '원음' : `${voiceShift > 0 ? '+' : ''}${voiceShift} 반음`}
-            </div>
-            <button onClick={() => adjustVoiceShift(0.5)} disabled={voiceShift >= 7} style={stepBtn} aria-label="반음 0.5 높이기">＋</button>
-            <button onClick={() => playMyVoice(voiceShift)} style={playBtn}>▶ 들어보기</button>
-            {voiceShift !== 0 && (
-              <button onClick={() => { setVoiceShift(0); playMyVoice(0) }} style={resetBtn}>원음</button>
-            )}
-          </div>
-          <p style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)', marginTop: 6 }}>
-            −/＋로 0.5반음씩 조절해 바로 들어봐요. +면 높게, −면 낮게. 재생 속도는 그대로 유지돼요.
-          </p>
-        </div>
-      )}
+      {/* 🎙 내 목소리 다시듣기 · 플레이어(재생/탐색/음정/저장) */}
+      {phase === 'done' && recordedBuf && <VoicePlayer buffer={recordedBuf} />}
 
       <p style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-sm)' }}>
         팁: <b>유선 이어폰</b> 권장. 가이드 녹음은 <b>원곡(보컬 있는 영상)</b>을 틀고 멜로디를 흥얼거리면 가장 정확합니다. 정밀 모드는 그 가이드와 같은 영상에서 채점할 때 타임라인이 맞습니다.
@@ -780,21 +731,5 @@ const primaryBtn: React.CSSProperties = {
 const ghostBtn: React.CSSProperties = {
   padding: '6px 12px', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-bold)',
   color: 'var(--color-text)', background: 'var(--color-bg)', border: 'var(--border-width) solid var(--color-border)',
-  borderRadius: 'var(--radius-pill)', cursor: 'pointer', fontFamily: 'var(--font-family)',
-}
-// 0.5반음 변조 스테퍼 버튼들
-const stepBtn: React.CSSProperties = {
-  width: 40, height: 40, fontSize: 22, fontWeight: 'var(--font-weight-heavy)', lineHeight: 1,
-  color: 'var(--color-text)', background: 'var(--color-bg)', border: 'var(--border-width) solid var(--color-border)',
-  borderRadius: 'var(--radius-pill)', cursor: 'pointer', fontFamily: 'var(--font-family)',
-}
-const playBtn: React.CSSProperties = {
-  padding: 'var(--space-xs) var(--space-md)', fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-bold)',
-  color: 'var(--color-text-inverse)', background: 'var(--color-primary)', border: 'none',
-  borderRadius: 'var(--radius-lg)', cursor: 'pointer', fontFamily: 'var(--font-family)',
-}
-const resetBtn: React.CSSProperties = {
-  padding: '6px 12px', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-bold)',
-  color: 'var(--color-text-secondary)', background: 'transparent', border: 'var(--border-width) solid var(--color-border)',
   borderRadius: 'var(--radius-pill)', cursor: 'pointer', fontFamily: 'var(--font-family)',
 }
