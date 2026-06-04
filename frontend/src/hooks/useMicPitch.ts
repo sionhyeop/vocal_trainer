@@ -26,11 +26,13 @@ export function useMicPitch(onFrame: (f: PitchFrame) => void) {
   const rafRef = useRef<number>(0)
   const bufRef = useRef<Float32Array<ArrayBuffer> | null>(null)
   const detectRef = useRef<ReturnType<typeof createPitchDetector> | null>(null)
+  const genRef = useRef(0) // 세대 토큰: 진행 중 start()가 stop()/재시작에 의해 무효화되면 폐기
   // onFrame을 ref로 고정해 start를 재생성하지 않음
   const onFrameRef = useRef(onFrame)
   onFrameRef.current = onFrame
 
   const stop = useCallback(() => {
+    genRef.current++ // 대기 중인(awaiting getUserMedia) start()를 무효화 — 누수 방지
     cancelAnimationFrame(rafRef.current)
     captureRef.current?.stop()
     captureRef.current = null
@@ -39,8 +41,12 @@ export function useMicPitch(onFrame: (f: PitchFrame) => void) {
 
   const start = useCallback(async (): Promise<boolean> => {
     setError(null)
+    if (captureRef.current) stop() // 재진입: 기존 캡처/루프 먼저 정리
+    const myGen = ++genRef.current
     try {
       const cap = await startMicCapture(2048)
+      // 그사이 stop()/재시작이 있었으면 방금 연 스트림을 즉시 닫고 폐기
+      if (genRef.current !== myGen) { cap.stop(); return false }
       captureRef.current = cap
       bufRef.current = new Float32Array(cap.analyser.fftSize)
       detectRef.current = createPitchDetector(cap.analyser.fftSize)
@@ -84,6 +90,7 @@ export function useMicPitch(onFrame: (f: PitchFrame) => void) {
       let sinceVoiced = 0
 
       const loop = () => {
+        if (genRef.current !== myGen) return // 무효화된(오래된) 루프는 스스로 종료
         const buf = bufRef.current!
         cap.readTimeDomain(buf)
         const rms = computeRms(buf)
@@ -110,7 +117,12 @@ export function useMicPitch(onFrame: (f: PitchFrame) => void) {
           }
         }
 
-        onFrameRef.current({ hz: pitchHz, clarity, rms, midi, voiced })
+        // 소비자(onFrame)에서 예외가 나도 마이크 루프가 죽지 않게 — 한 프레임만 건너뛴다
+        try {
+          onFrameRef.current({ hz: pitchHz, clarity, rms, midi, voiced })
+        } catch (err) {
+          console.error('useMicPitch onFrame error (frame skipped):', err)
+        }
         rafRef.current = requestAnimationFrame(loop)
       }
       rafRef.current = requestAnimationFrame(loop)
@@ -125,7 +137,7 @@ export function useMicPitch(onFrame: (f: PitchFrame) => void) {
       setRunning(false)
       return false
     }
-  }, [])
+  }, [stop])
 
   // 채점용으로 열린 마이크 스트림을 그대로 노출(녹음 재사용용)
   const getStream = useCallback((): MediaStream | null => captureRef.current?.stream ?? null, [])

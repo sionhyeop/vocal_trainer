@@ -10,6 +10,7 @@ import GamesHub from '../features/games/GamesHub'
 import ClimberGame from '../features/games/ClimberGame'
 import EchoGame from '../features/games/EchoGame'
 import EarGame from '../features/games/EarGame'
+import NoteBreaker from '../features/games/NoteBreaker'
 import HistoryScreen from '../features/history/HistoryScreen'
 import ProfilePage from '../features/profile/ProfilePage'
 import AdminPage from '../features/admin/AdminPage'
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: 'games/climber', element: <ClimberGame /> },
       { path: 'games/echo', element: <EchoGame /> },
       { path: 'games/ear', element: <EarGame /> },
+      { path: 'games/breaker', element: <NoteBreaker /> },
       { path: 'history', element: <HistoryScreen /> },
       { path: 'profile', element: <ProfilePage /> },
       { path: 'admin', element: <AdminPage /> },

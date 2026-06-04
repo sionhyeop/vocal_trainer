@@ -1,11 +1,11 @@
-// EchoGame.tsx — 🎼 멜로디 따라부르기(Simon식): 들은 멜로디를 따라 부르면 한 음씩 길어짐
+// EchoGame.tsx — 🎼 멜로디 따라부르기: 유명 발라드 5곡 중 골라 듣고 따라 부르기(정확도 채점)
 import { useCallback, useRef, useState } from 'react'
 import NavBar from '../../components/NavBar'
 import { useMicPitch, type PitchFrame } from '../../hooks/useMicPitch'
 import { playTone } from '../../audio/oscillator'
 import { midiToHz, midiToNoteName } from '../../lib/midi'
 import { setGameStars } from '../../lib/storage'
-import { ECHO_LEVELS, type EchoLevel } from './levels'
+import { BALLADS, type BalladSong } from './levels'
 import LevelSelect from './LevelSelect'
 import ClearOverlay from './ClearOverlay'
 
@@ -13,9 +13,7 @@ const GAME_ID = 'echo'
 const COLOR = 'var(--color-macaw)'
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
-function randSeq(scale: number[], len: number): number[] {
-  return Array.from({ length: len }, () => scale[Math.floor(Math.random() * scale.length)])
-}
+
 // 옥타브 무관 오차(반음): 저음/고음 사용자 모두 통과
 function octaveErr(a: number, b: number): number {
   let best = Infinity
@@ -43,25 +41,40 @@ function segmentize(samples: (number | null)[]): number[] {
   flush()
   return segs
 }
+// 부른 음들을 멜로디에 정렬(앞뒤 ±2 오프셋 중 최다 적중)해 음별 적중 배열 반환
+function alignHits(segs: number[], melody: number[], tol: number): boolean[] {
+  let bestOff = 0
+  let bestHits = -1
+  for (let off = -2; off <= 2; off++) {
+    let h = 0
+    for (let i = 0; i < melody.length; i++) {
+      const s = segs[i + off]
+      if (s != null && octaveErr(s, melody[i]) <= tol) h++
+    }
+    if (h > bestHits) { bestHits = h; bestOff = off }
+  }
+  return melody.map((m, i) => {
+    const s = segs[i + bestOff]
+    return s != null && octaveErr(s, m) <= tol
+  })
+}
 
-type Phase = 'select' | 'level' | 'result'
+type Phase = 'select' | 'song' | 'result'
 type Status = 'ready' | 'listening' | 'singing'
 
 export default function EchoGame() {
   const [phase, setPhase] = useState<Phase>('select')
-  const [level, setLevel] = useState<EchoLevel | null>(null)
-  const [levelIdx, setLevelIdx] = useState(0)
-  const [melody, setMelody] = useState<number[]>([])
-  const [hearts, setHearts] = useState(3)
+  const [song, setSong] = useState<BalladSong | null>(null)
+  const [songIdx, setSongIdx] = useState(0)
   const [status, setStatus] = useState<Status>('ready')
   const [playIdx, setPlayIdx] = useState(-1)
   const [msg, setMsg] = useState('')
-  const [heard, setHeard] = useState<number[] | null>(null) // 채점 후 내가 부른 음
-  const [result, setResult] = useState<{ cleared: boolean; stars: number } | null>(null)
+  const [hits, setHits] = useState<boolean[] | null>(null)
+  const [result, setResult] = useState<{ cleared: boolean; stars: number; pct: number } | null>(null)
 
   const samplesRef = useRef<(number | null)[]>([])
   const collectingRef = useRef(false)
-  const melodyRef = useRef<number[]>([])
+  const playGuardRef = useRef(0) // 듣기 중복재생 방지 토큰
 
   const onFrame = useCallback((f: PitchFrame) => {
     if (!collectingRef.current) return
@@ -69,67 +82,65 @@ export default function EchoGame() {
   }, [])
   const { error, start, stop } = useMicPitch(onFrame)
 
-  const playLevel = useCallback((idx: number) => {
-    const lv = ECHO_LEVELS[idx]
-    const m = randSeq(lv.scale, lv.startLen)
-    melodyRef.current = m
-    setLevel(lv); setLevelIdx(idx); setMelody(m); setHearts(3); setStatus('ready')
-    setMsg(''); setHeard(null); setResult(null); setPhase('level')
+  const pickSong = useCallback((idx: number) => {
+    setSong(BALLADS[idx]); setSongIdx(idx); setStatus('ready')
+    setPlayIdx(-1); setMsg('🔊 먼저 멜로디를 들어보세요'); setHits(null); setResult(null); setPhase('song')
   }, [])
 
   const listen = useCallback(async () => {
-    const lv = level
-    if (!lv) return
-    setStatus('listening'); setHeard(null); setMsg('잘 들어보세요…')
-    const m = melodyRef.current
-    for (let i = 0; i < m.length; i++) {
+    const s = song
+    if (!s) return
+    const token = ++playGuardRef.current
+    setStatus('listening'); setHits(null); setMsg('잘 들어보세요…')
+    const beatMs = 60000 / s.bpm
+    for (let i = 0; i < s.melody.length; i++) {
+      if (playGuardRef.current !== token) return // 도중 이탈/재시작 시 중단
+      const [midi, beats] = s.melody[i]
       setPlayIdx(i)
-      playTone(midiToHz(m[i]), lv.noteMs * 0.92)
-      await sleep(lv.noteMs)
+      playTone(midiToHz(midi), beats * beatMs * 0.92)
+      await sleep(beats * beatMs)
     }
     setPlayIdx(-1); setStatus('ready'); setMsg('이제 따라 불러보세요 🎤')
-  }, [level])
+  }, [song])
 
   const sing = useCallback(async () => {
     samplesRef.current = []
+    setHits(null); setStatus('singing'); setMsg('마이크 준비 중…')
+    const ok = await start()
+    if (!ok) { collectingRef.current = false; setStatus('ready'); setMsg('마이크를 시작할 수 없어요. 권한 허용 후 다시 시도하세요.'); return }
     collectingRef.current = true
-    setHeard(null); setStatus('singing'); setMsg('따라 부르고 끝나면 [채점]을 누르세요')
-    await start()
+    setMsg('멜로디를 따라 부르고, 끝나면 [채점]을 누르세요')
   }, [start])
 
   const grade = useCallback(() => {
-    const lv = level
-    if (!lv) return
+    const s = song
+    if (!s) return
     collectingRef.current = false
     stop()
     const segs = segmentize(samplesRef.current)
-    const m = melodyRef.current
-    setHeard(segs.map((s) => Math.round(s)))
-
-    let ok = true
-    for (let i = 0; i < m.length; i++) {
-      const s = segs[i]
-      if (s == null || octaveErr(s, m[i]) > lv.tolSemi) { ok = false; break }
-    }
+    const melodyMidis = s.melody.map((n) => n[0])
+    const h = alignHits(segs, melodyMidis, s.tolSemi)
+    setHits(h)
     setStatus('ready')
 
-    if (ok) {
-      if (m.length >= lv.maxLen) {
-        const stars = hearts >= 3 ? 3 : hearts === 2 ? 2 : 1
-        setGameStars(GAME_ID, lv.id, stars)
-        setResult({ cleared: true, stars }); setPhase('result')
-      } else {
-        const nm = [...m, lv.scale[Math.floor(Math.random() * lv.scale.length)]]
-        melodyRef.current = nm; setMelody(nm)
-        setMsg(`정답! 한 음 추가 (${nm.length}음). 다시 들어보세요`)
-      }
+    const matched = h.filter(Boolean).length
+    const pct = Math.round((matched / melodyMidis.length) * 100)
+    const stars = pct >= 85 ? 3 : pct >= 65 ? 2 : pct >= 45 ? 1 : 0
+    if (stars >= 1) {
+      setGameStars(GAME_ID, s.id, stars)
+      setResult({ cleared: true, stars, pct })
+      setPhase('result')
     } else {
-      const h = hearts - 1
-      setHearts(h)
-      if (h <= 0) { setResult({ cleared: false, stars: 0 }); setPhase('result') }
-      else setMsg(`아쉬워요 (하트 ${h}개 남음). 다시 들어보세요`)
+      setMsg(`정확도 ${pct}% — 조금 더! 멜로디를 다시 듣고 도전해보세요`)
     }
-  }, [level, hearts, stop])
+  }, [song, stop])
+
+  const leave = useCallback(() => {
+    playGuardRef.current++
+    collectingRef.current = false
+    stop()
+    setPhase('select'); setSong(null)
+  }, [stop])
 
   // ── 렌더 ──────────────────────────────────────
   if (phase === 'select') {
@@ -137,34 +148,41 @@ export default function EchoGame() {
       <main style={wrap}>
         <NavBar title="멜로디 따라부르기" />
         <h1 style={{ ...h1, color: COLOR }}>🎼 멜로디 따라부르기</h1>
-        <p style={sub}>멜로디를 듣고 그대로 따라 부르세요. 맞히면 한 음씩 길어집니다. (옥타브는 달라도 OK)</p>
-        <LevelSelect gameId={GAME_ID} levels={ECHO_LEVELS} color={COLOR} onPick={playLevel} />
+        <p style={sub}>유명 발라드를 골라 멜로디를 듣고 따라 부르세요. 정확도로 별을 받습니다. (옥타브는 달라도 OK)</p>
+        <LevelSelect
+          gameId={GAME_ID}
+          levels={BALLADS.map((b) => ({ id: b.id, name: `${b.title} · ${b.artist}` }))}
+          color={COLOR}
+          onPick={pickSong}
+        />
       </main>
     )
   }
 
-  const lv = level!
+  const s = song!
+  const matched = hits ? hits.filter(Boolean).length : 0
   return (
     <main style={wrap}>
       <NavBar title="멜로디 따라부르기" />
       {error && <p style={{ color: 'var(--color-cardinal)' }}>{error}</p>}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
-        <span style={{ fontWeight: 'var(--font-weight-bold)', color: COLOR }}>{lv.name} · {melody.length}음</span>
-        <span style={{ fontSize: 'var(--font-size-subhead)' }}>{'❤️'.repeat(hearts)}{'🤍'.repeat(3 - hearts)}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 'var(--space-sm)' }}>
+        <span style={{ fontWeight: 'var(--font-weight-bold)', color: COLOR }}>{s.title} · {s.artist}</span>
+        <span style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>{s.melody.length}음</span>
       </div>
 
-      {/* 멜로디 패드 */}
-      <div style={{ display: 'flex', gap: 'var(--space-xs)', flexWrap: 'wrap', marginBottom: 'var(--space-md)' }}>
-        {melody.map((n, i) => {
+      {/* 멜로디 패드(재생 중 하이라이트, 채점 후 적중/실패) */}
+      <div style={{ display: 'flex', gap: 'var(--space-xs)', flexWrap: 'wrap', marginBottom: 'var(--space-sm)' }}>
+        {s.melody.map(([n], i) => {
           const lit = playIdx === i
+          const hit = hits ? hits[i] : null
+          const bg = lit ? COLOR : hit === true ? 'var(--color-primary)' : hit === false ? 'var(--color-cardinal)' : 'var(--color-bg-subtle)'
+          const fg = lit || hit != null ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)'
           return (
             <div key={i} style={{
-              width: 52, height: 52, borderRadius: 'var(--radius-md)', display: 'grid', placeItems: 'center',
+              width: 48, height: 48, borderRadius: 'var(--radius-md)', display: 'grid', placeItems: 'center',
               fontWeight: 'var(--font-weight-heavy)', fontSize: 'var(--font-size-caption)',
-              background: lit ? COLOR : 'var(--color-bg-subtle)',
-              color: lit ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)',
-              border: '2px solid', borderColor: lit ? COLOR : 'var(--color-border)',
+              background: bg, color: fg, border: '2px solid', borderColor: lit ? COLOR : 'var(--color-border)',
               transform: lit ? 'translateY(-4px)' : 'none', transition: 'all var(--duration-fast)',
             }}>
               {midiToNoteName(n)}
@@ -173,44 +191,30 @@ export default function EchoGame() {
         })}
       </div>
 
-      {/* 내가 부른 음(채점 후) */}
-      {heard && (
-        <div style={{ marginBottom: 'var(--space-md)' }}>
-          <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)', marginBottom: 4 }}>내가 부른 음</div>
-          <div style={{ display: 'flex', gap: 'var(--space-xs)', flexWrap: 'wrap' }}>
-            {heard.length === 0 && <span style={{ color: 'var(--color-text-secondary)' }}>(소리가 안 잡혔어요)</span>}
-            {heard.map((n, i) => {
-              const good = i < melody.length && octaveErr(n, melody[i]) <= lv.tolSemi
-              return (
-                <span key={i} style={{
-                  padding: '4px 10px', borderRadius: 'var(--radius-pill)', fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-caption)',
-                  background: good ? 'var(--color-primary)' : 'var(--color-cardinal)', color: 'var(--color-text-inverse)',
-                }}>{midiToNoteName(n)}</span>
-              )
-            })}
-          </div>
-        </div>
+      {hits && (
+        <p style={{ fontWeight: 'var(--font-weight-bold)', color: matched >= s.melody.length * 0.65 ? 'var(--color-primary)' : 'var(--color-fox)' }}>
+          정확도 {Math.round((matched / s.melody.length) * 100)}% ({matched}/{s.melody.length}음)
+        </p>
       )}
-
       <p style={{ minHeight: 24, fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text)' }}>{msg}</p>
 
       <div style={{ display: 'flex', gap: 'var(--space-xs)', flexWrap: 'wrap' }}>
         <button onClick={listen} disabled={status !== 'ready'} style={{ ...primary, opacity: status === 'ready' ? 1 : 0.5 }}>🔊 멜로디 듣기</button>
         {status === 'singing'
-          ? <button onClick={grade} style={{ ...primary, background: 'var(--color-primary)', boxShadow: 'var(--shadow-button)' }}>✅ 채점</button>
-          : <button onClick={sing} disabled={status !== 'ready'} style={{ ...primary, background: COLOR, boxShadow: '0 4px 0 var(--color-macaw-shadow)', opacity: status === 'ready' ? 1 : 0.5 }}>🎤 따라부르기</button>}
-        <button onClick={() => { stop(); collectingRef.current = false; setPhase('select'); setLevel(null) }} style={ghost}>← 레벨 선택</button>
+          ? <button onClick={grade} style={{ ...primary, background: 'var(--color-primary)' }}>✅ 채점</button>
+          : <button onClick={sing} disabled={status !== 'ready'} style={{ ...primary, background: COLOR, opacity: status === 'ready' ? 1 : 0.5 }}>🎤 따라부르기</button>}
+        <button onClick={leave} style={ghost}>← 곡 선택</button>
       </div>
 
       {phase === 'result' && result && (
         <ClearOverlay
           cleared={result.cleared}
           stars={result.stars}
-          detail={result.cleared ? `${lv.name} 완성!` : '하트를 모두 잃었어요. 다시 도전!'}
-          hasNext={levelIdx + 1 < ECHO_LEVELS.length}
-          onRetry={() => playLevel(levelIdx)}
-          onSelect={() => { setResult(null); setPhase('select'); setLevel(null) }}
-          onNext={() => playLevel(levelIdx + 1)}
+          detail={`${s.title} — 정확도 ${result.pct}%!`}
+          hasNext={songIdx + 1 < BALLADS.length}
+          onRetry={() => pickSong(songIdx)}
+          onSelect={() => { setResult(null); setPhase('select'); setSong(null) }}
+          onNext={() => pickSong(songIdx + 1)}
         />
       )}
     </main>

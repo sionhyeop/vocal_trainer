@@ -4,9 +4,10 @@ import NavBar from '../../components/NavBar'
 import { totalStars } from '../../lib/storage'
 
 const GAMES = [
-  { to: '/games/climber', icon: '🪜', label: '음역대 클라이머', desc: '목표 음을 정확히 내서 한 칸씩 등반 · 음정·음역 훈련', color: 'var(--color-fox)' },
+  { to: '/games/breaker', icon: '🧱', label: '음 깨기', desc: '날아오는 음표를 그 음정으로 소리내 깨기 · 콤보 아케이드', color: 'var(--color-cardinal)' },
+  { to: '/games/echo', icon: '🎼', label: '멜로디 따라부르기', desc: '유명 발라드 5곡 듣고 따라 부르기 · 청음 + 가창', color: 'var(--color-macaw)' },
+  { to: '/games/climber', icon: '🪜', label: '음역대 클라이머', desc: '음정 차트 보며 목표 음 유지해 등반 · 음정·음역 훈련', color: 'var(--color-fox)' },
   { to: '/games/ear', icon: '🎧', label: '음 듣고 맞히기', desc: '음 이름·음정 간격 청음 퀴즈 · 절대/상대음감', color: 'var(--color-beetle)' },
-  { to: '/games/echo', icon: '🎼', label: '멜로디 따라부르기', desc: '들은 멜로디 따라 부르기 · 청음 + 가창', color: 'var(--color-macaw)' },
 ]
 
 export default function GamesHub() {

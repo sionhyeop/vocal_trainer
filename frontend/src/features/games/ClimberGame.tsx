@@ -1,5 +1,5 @@
 // ClimberGame.tsx — 🪜 음역대 클라이머: 목표 음을 마이크로 유지해 한 칸씩 등반
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import NavBar from '../../components/NavBar'
 import { useMicPitch, type PitchFrame } from '../../hooks/useMicPitch'
 import { midiToNoteName } from '../../lib/midi'
@@ -10,6 +10,69 @@ import ClearOverlay from './ClearOverlay'
 
 const GAME_ID = 'climber'
 const COLOR = 'var(--color-fox)'
+
+// 실시간 음정 차트 — 목표 밴드에 내 피치 트레일이 다가가는지 보여줌(R→L 흐름)
+const CHART_WIN_MS = 3500
+const CHART_SPAN_SEMI = 6 // 화면 위아래로 표시할 반음 범위(±)
+function drawClimberChart(
+  canvas: HTMLCanvasElement | null,
+  hist: { tMs: number; midi: number | null }[],
+  target: number,
+  tolSemi: number,
+  now: number,
+) {
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  // 논리 좌표(CSS px)로 그린다 — 백킹스토어는 DPR배율, ctx는 setTransform으로 스케일됨
+  const w = canvas.clientWidth
+  const h = canvas.clientHeight
+  ctx.clearRect(0, 0, w, h)
+  const yFor = (midi: number) => h / 2 - ((midi - target) / CHART_SPAN_SEMI) * (h / 2 - 8)
+  const xFor = (tMs: number) => w - ((now - tMs) / CHART_WIN_MS) * w
+
+  // 배경
+  ctx.fillStyle = '#f7f7f7'
+  ctx.fillRect(0, 0, w, h)
+  // 목표 허용 밴드(초록)
+  const yTop = yFor(target + tolSemi)
+  const yBot = yFor(target - tolSemi)
+  ctx.fillStyle = 'rgba(88,204,2,0.18)'
+  ctx.fillRect(0, yTop, w, yBot - yTop)
+  // 목표 중심선(점선)
+  ctx.strokeStyle = '#58cc02'
+  ctx.lineWidth = 2
+  ctx.setLineDash([6, 5])
+  ctx.beginPath(); ctx.moveTo(0, yFor(target)); ctx.lineTo(w, yFor(target)); ctx.stroke()
+  ctx.setLineDash([])
+  // 목표 라벨
+  ctx.fillStyle = '#58a700'
+  ctx.font = 'bold 12px sans-serif'
+  ctx.fillText('🎯 ' + midiToNoteName(target), 6, Math.max(12, yFor(target) - 6))
+
+  // 내 피치 트레일
+  let started = false
+  ctx.lineWidth = 3
+  ctx.lineJoin = 'round'
+  ctx.beginPath()
+  for (const s of hist) {
+    if (s.midi == null) { started = false; continue }
+    const x = xFor(s.tMs)
+    const y = Math.max(2, Math.min(h - 2, yFor(s.midi)))
+    if (!started) { ctx.moveTo(x, y); started = true } else ctx.lineTo(x, y)
+  }
+  ctx.strokeStyle = '#ff9600'
+  ctx.stroke()
+
+  // 현재 음 마커(오른쪽 끝)
+  const last = [...hist].reverse().find((s) => s.midi != null)
+  if (last && last.midi != null) {
+    const y = Math.max(4, Math.min(h - 4, yFor(last.midi)))
+    const inBand = Math.abs(last.midi - target) <= tolSemi
+    ctx.fillStyle = inBand ? '#58cc02' : '#ff9600'
+    ctx.beginPath(); ctx.arc(w - 8, y, 7, 0, Math.PI * 2); ctx.fill()
+  }
+}
 
 // 프로필 음역대 중심으로 옥타브 단위 이동(난이도 스케일)
 function fitTranspose(notes: number[]): number {
@@ -40,6 +103,9 @@ export default function ClimberGame() {
   const rungStartRef = useRef(0)
   const errRef = useRef<number[]>([]) // 누적 |오차|(반음)
   const doneRef = useRef(false)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const chartRef = useRef<{ tMs: number; midi: number | null }[]>([])
+  const anchoredRef = useRef(false) // 첫 발성에 사다리를 사용자 옥타브로 맞췄는지
 
   const finish = useCallback((cleared: boolean) => {
     if (doneRef.current) return
@@ -68,6 +134,16 @@ export default function ClimberGame() {
     setRemain(Math.max(0, left / level.timeLimitMs))
     if (left <= 0) { finish(false); return }
 
+    // 프로필이 없으면(=transpose 0) 첫 발성에 사다리를 사용자 옥타브로 맞춰
+    // 저음(남성)도 도달 가능하게. 옥타브 자체는 게임의 핵심이라 유지(같은 음 반복 클리어 방지).
+    if (!anchoredRef.current && f.voiced && f.midi != null) {
+      anchoredRef.current = true
+      if (!getProfile()) {
+        const t0 = level.notes[0] + transposeRef.current
+        transposeRef.current += 12 * Math.round((f.midi - t0) / 12)
+      }
+    }
+
     const target = level.notes[rungRef.current] + transposeRef.current
     if (f.voiced && f.midi != null) {
       setLive(f.midi)
@@ -84,6 +160,12 @@ export default function ClimberGame() {
     }
 
     setGauge(Math.min(1, holdRef.current / level.holdMs))
+
+    // 실시간 음정 차트 갱신(목표 밴드에 다가가는지)
+    const hist = chartRef.current
+    hist.push({ tMs: now, midi: f.voiced && f.midi != null ? f.midi : null })
+    while (hist.length && now - hist[0].tMs > CHART_WIN_MS) hist.shift()
+    drawClimberChart(canvasRef.current, hist, target, level.tolSemi, now)
 
     if (holdRef.current >= level.holdMs) {
       const next = rungRef.current + 1
@@ -103,15 +185,35 @@ export default function ClimberGame() {
     rungRef.current = 0
     holdRef.current = 0
     errRef.current = []
+    chartRef.current = []
+    anchoredRef.current = false
     doneRef.current = false
     lastTRef.current = performance.now()
     rungStartRef.current = performance.now()
     setLevel(lv); setLevelIdx(idx); setRung(0); setGauge(0); setLive(null); setRemain(1); setResult(null)
     setPhase('playing')
-    await start()
+    const ok = await start()
+    if (!ok) { setPhase('select'); setLevel(null) } // 마이크 거부/실패 → 멈춤화면 대신 선택으로
   }, [start])
 
   const backToSelect = useCallback(() => { stop(); doneRef.current = true; setPhase('select'); setLevel(null) }, [stop])
+
+  // 차트 캔버스 사이즈(플레이 진입 시)
+  useEffect(() => {
+    if (phase !== 'playing') return
+    const c = canvasRef.current
+    if (!c) return
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 3)
+      c.width = Math.round(c.clientWidth * dpr)
+      c.height = Math.round(140 * dpr)
+      const cx = c.getContext('2d')
+      if (cx) cx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    return () => window.removeEventListener('resize', resize)
+  }, [phase])
 
   // ── 렌더 ──────────────────────────────────────
   if (phase === 'select') {
@@ -165,6 +267,10 @@ export default function ClimberGame() {
           <div style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-bold)', color: inTune ? 'var(--color-primary)' : 'var(--color-text-secondary)', minHeight: 26 }}>
             {live == null ? '🎤 소리를 내보세요' : inTune ? '✅ 좋아요! 유지하세요' : `내 음: ${midiToNoteName(live)} ${live > target ? '↓ 낮춰요' : '↑ 높여요'}`}
           </div>
+
+          {/* 실시간 음정 차트: 점선=목표, 초록밴드=허용범위, 주황선=내 피치 */}
+          <canvas ref={canvasRef} role="img" aria-label="실시간 음정 차트 — 목표 음 밴드와 내 음정" style={{ width: '100%', height: 140, borderRadius: 'var(--radius-md)', border: 'var(--border-width) solid var(--color-border)', marginTop: 'var(--space-sm)' }} />
+          <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)', marginTop: 4 }}>점선=목표 · 초록밴드=정답범위 · 주황=내 음정(밴드에 맞추세요)</div>
 
           {/* 유지 게이지 */}
           <div style={{ marginTop: 'var(--space-md)', height: 22, background: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}>
