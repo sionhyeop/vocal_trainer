@@ -31,7 +31,8 @@ async function fetchBackend(
   artist: string | undefined,
   signal: AbortSignal,
 ): Promise<{ data: LyricsApiResponse | null; status: number }> {
-  const url = new URL(`${API}/api/lyrics`)
+  // API 설정 시 그 백엔드(절대), 없으면 같은 출처 /api/lyrics 서버리스(상대 → origin 기준 해석)
+  const url = new URL(`${API || ''}/api/lyrics`, window.location.origin)
   url.searchParams.set('track', track)
   if (artist) url.searchParams.set('artist', artist)
   const res = await fetch(url.toString(), { signal })
@@ -183,69 +184,32 @@ export function useLyrics(parsed: ParsedTitle | null, videoId?: string, refreshK
         attempts.push({ track: altTrack, artist: altArtist || undefined })
       }
 
+      // 가사 소스: 엔드포인트 우선 — dev=Python 백엔드(VITE_LYRICS_API), prod=같은 출처 /api/lyrics 서버리스.
+      // (정적 배포에서 브라우저가 lrclib을 직접 못 부르므로[CORS] 서버측 프록시가 필수)
+      // 엔드포인트가 완전히 실패하면 브라우저 직접 lrclib을 최후 폴백으로 1회 시도.
+      const setFromData = (data: LyricsApiResponse, source: 'backend' | 'direct') => {
+        setResult({
+          lines: data.synced ? mergeShortLines(parseLrc(data.synced)) : [],
+          plain: data.plain ?? null,
+          status: 'ok',
+          matched: [data.matched_artist, data.matched_track].filter(Boolean).join(' - ') || null,
+          source,
+        })
+      }
       for (const a of attempts) {
         try {
-          if (API) {
-            const { data, status } = await fetchBackend(
-              a.track,
-              a.artist,
-              controller.signal,
-            )
-            if (aborted) return
-            if (status === 404 || !data) continue
-            if (data.synced || data.plain) {
-              setResult({
-                lines: data.synced ? mergeShortLines(parseLrc(data.synced)) : [],
-                plain: data.plain ?? null,
-                status: 'ok',
-                matched:
-                  [data.matched_artist, data.matched_track]
-                    .filter(Boolean)
-                    .join(' - ') || null,
-                source: 'backend',
-              })
-              return
-            }
-          } else {
-            const data = await fetchDirect(a.track, a.artist, controller.signal)
-            if (aborted) return
-            if (data && (data.synced || data.plain)) {
-              setResult({
-                lines: data.synced ? mergeShortLines(parseLrc(data.synced)) : [],
-                plain: data.plain ?? null,
-                status: 'ok',
-                matched:
-                  [data.matched_artist, data.matched_track]
-                    .filter(Boolean)
-                    .join(' - ') || null,
-                source: 'direct',
-              })
-              return
-            }
-          }
+          const { data, status } = await fetchBackend(a.track, a.artist, controller.signal)
+          if (aborted) return
+          if (status === 404 || !data) continue
+          if (data.synced || data.plain) { setFromData(data, API ? 'backend' : 'direct'); return }
         } catch (e) {
           if (aborted || controller.signal.aborted) return
-          // 백엔드 네트워크 완전 실패 → 직접 lrclib fallback 1회
-          if (API) {
-            try {
-              const data = await fetchDirect(a.track, a.artist, controller.signal)
-              if (aborted) return
-              if (data && (data.synced || data.plain)) {
-                setResult({
-                  lines: data.synced ? mergeShortLines(parseLrc(data.synced)) : [],
-                  plain: data.plain ?? null,
-                  status: 'ok',
-                  matched:
-                    [data.matched_artist, data.matched_track]
-                      .filter(Boolean)
-                      .join(' - ') || null,
-                  source: 'direct',
-                })
-                return
-              }
-            } catch {
-              /* fall through */
-            }
+          try {
+            const data = await fetchDirect(a.track, a.artist, controller.signal)
+            if (aborted) return
+            if (data && (data.synced || data.plain)) { setFromData(data, 'direct'); return }
+          } catch {
+            /* fall through */
           }
         }
       }
