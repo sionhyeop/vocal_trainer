@@ -37,8 +37,8 @@ export class MelodyScorer {
     const { sumAbsCents, voiced, total } = this.acc
     let j: Judgment
     const coverage = total > 0 ? voiced / total : 0
-    if (coverage < 0.15 || voiced === 0) {
-      j = 'Miss' // 목표 구간 거의 안 부름 (커버리지 임계 완화 0.25→0.15)
+    if (coverage < 0.1 || voiced === 0) {
+      j = 'Miss' // 목표 구간 거의 안 부름 (커버리지 임계 완화 0.15→0.10)
     } else {
       // 평균 cent 편차 기반, score.ts의 관대한 임계 재사용
       j = judge(sumAbsCents / voiced, true)
@@ -95,6 +95,6 @@ export class MelodyScorer {
   accuracy(): number {
     const s = this.state
     if (s.ticks === 0) return 0
-    return (s.counts.Perfect * 100 + s.counts.Great * 80 + s.counts.Good * 55) / s.ticks
+    return (s.counts.Perfect * 100 + s.counts.Great * 90 + s.counts.Good * 74) / s.ticks
   }
 }

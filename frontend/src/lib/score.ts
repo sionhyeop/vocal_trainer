@@ -3,20 +3,20 @@
 
 export type Judgment = 'Perfect' | 'Great' | 'Good' | 'Miss'
 
-// noteScore — 더 관대하게: 바닥 점수↑, 0점 컷오프↑ (입력 불안정 흡수)
+// noteScore — 훨씬 후하게: 바닥 점수↑↑, 컷오프↑, 기울기 완만(입력 불안정 흡수)
 export function scoreFromCents(cents: number): number {
   const a = Math.abs(cents)
-  if (a > 320) return 0
-  return Math.max(45, 100 - a * 0.2)
+  if (a > 450) return 0
+  return Math.max(62, 100 - a * 0.12)
 }
 
-// 판정 임계 — 매우 관대하게: 입력값이 불안정해도 정답으로 잘 인식.
+// 판정 임계 — 훨씬 관대하게: 거의 반음까지 Perfect, 3반음 가까이까지 Good.
 //   (옥타브 오검출은 호출부에서 옥타브-폴딩으로 이미 흡수됨)
 export function judge(absCents: number, voiced: boolean): Judgment {
   if (!voiced) return 'Miss'
-  if (absCents <= 70) return 'Perfect'   // 45 → 70
-  if (absCents <= 130) return 'Great'    // 90 → 130
-  if (absCents <= 220) return 'Good'     // 160 → 220 (반음 2개 이상까지 Good)
+  if (absCents <= 95) return 'Perfect'   // 70 → 95 (거의 반음까지)
+  if (absCents <= 175) return 'Great'    // 130 → 175
+  if (absCents <= 300) return 'Good'     // 220 → 300 (반음 3개 가까이까지 Good)
   return 'Miss'
 }
 
@@ -27,10 +27,10 @@ export const JUDGMENT_COLOR: Record<Judgment, string> = {
   Miss: 'var(--color-cardinal)',
 }
 
-// 판정별 획득 점수 (Good도 후하게)
+// 판정별 획득 점수 (Great·Good도 훨씬 후하게)
 export const JUDGMENT_POINTS: Record<Judgment, number> = {
   Perfect: 100,
-  Great: 80,
-  Good: 55,
+  Great: 90,
+  Good: 74,
   Miss: 0,
 }

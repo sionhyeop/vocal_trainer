@@ -13,10 +13,10 @@ interface ChartSong {
 }
 
 const TABS = [
+  { label: '발라드', cat: '발라드', color: 'var(--color-beetle)' }, // 기본 선택(맨 앞)
   { label: '케이팝', cat: '한국', color: 'var(--color-primary)' },
   { label: '제이팝', cat: '제이팝', color: 'var(--color-cardinal)' },
   { label: '팝송', cat: '팝', color: 'var(--color-macaw)' },
-  { label: '발라드', cat: '발라드', color: 'var(--color-beetle)' },
   { label: '트로트', cat: '트로트', color: 'var(--color-fox)' },
 ]
 
