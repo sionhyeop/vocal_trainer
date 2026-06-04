@@ -35,6 +35,22 @@ type Phase = 'idle' | 'countdown' | 'singing' | 'done'
 const VOICE_SHIFTS = [-7, -5, -3, 0, 3, 5, 7] // 내 목소리 변조(반음)
 type Mode = 'melody'
 
+// 시간 tMs에서의 목표 음정(midi) — 활성 노트 우선, 없으면 가까운(±600ms) 노트
+function targetMidiAt(notes: { startMs: number; endMs: number; midiNote: number }[], tMs: number): number | null {
+  for (const n of notes) if (tMs >= n.startMs && tMs < n.endMs) return n.midiNote
+  let best: number | null = null
+  let bestDist = 600
+  for (const n of notes) {
+    const d = tMs < n.startMs ? n.startMs - tMs : tMs > n.endMs ? tMs - n.endMs : 0
+    if (d < bestDist) { bestDist = d; best = n.midiNote }
+  }
+  return best
+}
+// 검출 음정을 목표 음정의 가장 가까운 옥타브로 스냅(서브하모닉/배음 오류 보정)
+function octaveAlign(midi: number, target: number): number {
+  return midi + 12 * Math.round((target - midi) / 12)
+}
+
 interface ScorerLike {
   state: ScoreState
   accuracy: () => number
@@ -183,20 +199,36 @@ export default function SingScreen() {
   const onFrame = useCallback(
     (f: PitchFrame) => {
       const tMs = getCurrentTime() * 1000
+      const notes = noteMapRef.current ? noteMapRef.current.notes : []
+
+      // 옥타브 교정 + 목표 스냅.
+      //  midi      = 채점/로그용(옥타브 오류만 보정, 같은 옥타브 안 실제 오차는 보존)
+      //  dispMidi  = 리본 표시용(목표에 가까우면 ±0.6반음 안에서 목표에 착 붙여 '굵직/투박'하게 차트와 일치)
+      let midi = f.midi
+      let dispMidi = f.midi
+      if (midi != null) {
+        const tgt = targetMidiAt(notes, tMs)
+        if (tgt != null) {
+          midi = octaveAlign(midi, tgt) // 서브하모닉(한 옥타브 낮음)/배음(높이 튐) 오류 보정
+          dispMidi = Math.abs(midi - tgt) <= 0.6 ? tgt : midi
+        } else {
+          dispMidi = midi
+        }
+      }
+
       const hist = historyRef.current
-      hist.push({ midi: f.midi, tMs })
+      hist.push({ midi: dispMidi, tMs })
       if (hist.length > MAX_HISTORY) hist.shift()
 
       // 리본 — 목표 가로막대 + 내 목소리, R→L 흐름
-      const notes = noteMapRef.current ? noteMapRef.current.notes : []
       drawMelodyRibbon(canvasRef.current, hist, notes, tMs)
 
       if (frameCountRef.current++ % 6 === 0) setRms(f.rms)
 
-      // 채점 + 세션 로그(호흡/약점 분석용)
+      // 채점 + 세션 로그(호흡/약점 분석용) — 교정된 음정 사용
       if (phaseRef.current === 'singing') {
-        sessionLogRef.current.push({ tMs, midi: f.midi, clarity: f.clarity, rms: f.rms, voiced: f.voiced })
-        const j: Judgment | null = melodyRef.current ? melodyRef.current.update(tMs, f.midi) : null
+        sessionLogRef.current.push({ tMs, midi, clarity: f.clarity, rms: f.rms, voiced: f.voiced })
+        const j: Judgment | null = melodyRef.current ? melodyRef.current.update(tMs, midi) : null
         if (j !== null) {
           const sc = activeScorerRef.current!
           // 점수는 0~100 (정확도). 콤보는 그대로.
