@@ -353,6 +353,12 @@ export default function SingScreen() {
     activeScorerRef.current = melodyRef.current
     const ok = await start()
     if (!ok) return
+    // ② 인트로 자동 점프 — 보컬 시작점(첫 노트) 약 3초 전으로 이동해 긴 도입부를 건너뜀.
+    //    가사·채점은 영상 시간 기준이라 seek만으로 자동 정렬된다.
+    const notes = noteMapRef.current.notes
+    const firstMs = notes.length ? notes[0].startMs : 0
+    const seekMs = Math.max(0, firstMs - 3000) // 3초 리드인
+    if (seekMs > 1000) seekTo(seekMs / 1000)
     startRecording() // 부르는 동안 백그라운드 자동 녹음
     setPhase('countdown')
     setCount(3)
@@ -365,7 +371,7 @@ export default function SingScreen() {
         play()
       } else setCount(c)
     }, 1000)
-  }, [start, play, startRecording])
+  }, [start, play, startRecording, seekTo])
 
   const onRetry = useCallback(() => {
     historyRef.current = []

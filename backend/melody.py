@@ -19,6 +19,10 @@ import librosa
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
+# 인트로(도입부)가 길어도 본 노래를 담기 위한 추가 스캔 여유(초)와 상한
+INTRO_SCAN_SECONDS = 75
+MAX_SCAN_SECONDS = 180
+
 
 def _cache_path(video_id: str) -> str:
     return os.path.join(CACHE_DIR, f"{video_id}.json")
@@ -255,6 +259,25 @@ def _set_progress(video_id: str, stage: str, pct: int) -> None:
     _progress[video_id] = {"stage": stage, "pct": pct}
 
 
+def _detect_vocal_start(contour: list[dict], win_ms: int = 1000, min_pts: int = 25) -> int:
+    """보컬이 '지속적으로' 시작되는 첫 시점(ms). contour는 유성 프레임만 담기므로,
+    win_ms 창 안에 유성 점이 min_pts개 이상 모이는 첫 지점을 노래 시작으로 본다
+    (인트로의 단발성 소리/추임새는 건너뜀). 못 찾으면 첫 점 또는 0."""
+    if not contour:
+        return 0
+    ts = [c["tMs"] for c in contour]
+    n = len(ts)
+    j = 0
+    for i in range(n):
+        if j < i:
+            j = i
+        while j < n and ts[j] < ts[i] + win_ms:
+            j += 1
+        if (j - i) >= min_pts:
+            return ts[i]
+    return ts[0]
+
+
 def extract_notemap(
     video_id: str, max_seconds: int = 120, separate: bool = True, force: bool = False, method: str = "auto"
 ) -> dict:
@@ -269,9 +292,11 @@ def extract_notemap(
     try:
         _set_progress(video_id, "원곡 다운로드 중", 8)
         wav = _download_audio(video_id, tmp)
-        # 앞 max_seconds초만 잘라 분리/추출 비용 제한
+        # 인트로(MV 도입부)가 길어도 본 노래를 담도록, max_seconds + 인트로 여유만큼 잘라 분석.
+        # (보컬 시작점을 찾아 거기서부터 max_seconds초만 노트맵으로 남긴다)
+        scan_seconds = min(max_seconds + INTRO_SCAN_SECONDS, MAX_SCAN_SECONDS)
         _set_progress(video_id, "오디오 변환", 22)
-        cropped = _crop(wav, os.path.join(tmp, "crop.wav"), max_seconds)
+        cropped = _crop(wav, os.path.join(tmp, "crop.wav"), scan_seconds)
         used = cropped
         separated = False
         if separate:
@@ -282,14 +307,24 @@ def extract_notemap(
                 separated = True
             _set_progress(video_id, "보컬 분리 완료", 68)
         _set_progress(video_id, "음정 추출", 76)
-        contour, dur, extractor = _extract_contour(used, max_seconds, method=method)
+        contour, _dur, extractor = _extract_contour(used, scan_seconds, method=method)
+
+        # ① 보컬 시작점 감지 → 그 지점부터 max_seconds초만 노트맵으로 사용(인트로 제거)
+        vocal_start_ms = _detect_vocal_start(contour)
+        end_ms = vocal_start_ms + max_seconds * 1000
+        trimmed = [c for c in contour if vocal_start_ms <= c["tMs"] < end_ms]
+        if trimmed:
+            contour = trimmed
+        span_ms = (contour[-1]["tMs"] - vocal_start_ms) if contour else 0
+
         _set_progress(video_id, "마무리", 96)
         result = {
             "videoId": video_id,
             "contour": contour,
             "extractor": extractor,
             "separated": separated,
-            "durationMs": int(dur * 1000),
+            "durationMs": int(span_ms),
+            "vocalStartMs": int(vocal_start_ms),  # ② 프론트가 재생을 여기로 점프
         }
         with open(cache, "w", encoding="utf-8") as f:
             json.dump(result, f)
