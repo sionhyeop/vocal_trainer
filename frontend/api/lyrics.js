@@ -51,7 +51,7 @@ export default async function handler(req, res) {
   if (!track) return res.status(400).json({ error: 'track required' })
 
   const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), 12000)
+  const timer = setTimeout(() => ctrl.abort(), 16000) // lrclib /api/search가 ~12s로 느려 여유
   try {
     // q 자유검색 변형들 (구조화 검색은 lrclib에서 신뢰 불가). lrclib이 느려 병렬로 호출.
     const queries = artist ? [`${artist} ${track}`, `${track} ${artist}`, track] : [track]
