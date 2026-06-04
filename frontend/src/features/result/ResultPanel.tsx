@@ -118,8 +118,22 @@ export default function ResultPanel({ score, maxCombo, counts, mode, breath, wea
         </div>
       </div>
 
-      {/* AI 코치 (스텁) */}
-      <CoachCard />
+      {/* AI 코치 (M7: Claude 연결) */}
+      <CoachCard
+        metrics={{
+          score: Math.round(score),
+          maxCombo,
+          counts,
+          mode,
+          breath: {
+            stability: breath.stability,
+            voicedRatio: breath.voicedRatio,
+            breathyRatio: breath.breathyRatio,
+            longestPhraseMs: breath.longestPhraseMs,
+          },
+          weak: weak.slice(0, 3).map((w) => ({ timeMs: w.timeMs, label: w.label, deviation: w.deviation })),
+        }}
+      />
 
       <button onClick={onRetry} style={retryBtn}>↻ 다시 부르기</button>
     </div>
