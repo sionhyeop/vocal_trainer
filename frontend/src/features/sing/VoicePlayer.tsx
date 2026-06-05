@@ -11,8 +11,8 @@ const fmt = (s: number) => {
   return `${m}:${String(sec).padStart(2, '0')}`
 }
 
-// AudioBuffer → 16bit PCM WAV Blob (저장용)
-function bufferToWav(buf: AudioBuffer): Blob {
+// AudioBuffer → 16bit PCM WAV Blob (저장용). gain으로 재생과 동일하게 정규화해 저장.
+function bufferToWav(buf: AudioBuffer, gain = 1): Blob {
   const numCh = buf.numberOfChannels
   const sr = buf.sampleRate
   const frames = buf.length
@@ -30,7 +30,7 @@ function bufferToWav(buf: AudioBuffer): Blob {
   for (let c = 0; c < numCh; c++) chans.push(buf.getChannelData(c))
   for (let i = 0; i < frames; i++) {
     for (let c = 0; c < numCh; c++) {
-      const x = Math.max(-1, Math.min(1, chans[c][i]))
+      const x = Math.max(-1, Math.min(1, chans[c][i] * gain))
       view.setInt16(o, x < 0 ? x * 0x8000 : x * 0x7fff, true); o += 2
     }
   }
@@ -50,6 +50,7 @@ export default function VoicePlayer({ buffer }: { buffer: AudioBuffer }) {
   const shiftRef = useRef(0)
   const playingRef = useRef(false)
   const loopRef = useRef(false)
+  const gainRef = useRef(1) // 녹음이 작을 때 클리핑 없이 키우는 정규화 게인
 
   const [playing, setPlaying] = useState(false)
   const [playhead, setPlayhead] = useState(0)
@@ -93,7 +94,10 @@ export default function VoicePlayer({ buffer }: { buffer: AudioBuffer }) {
     const from = Math.max(0, Math.min(duration - 0.02, fromSec))
     const src = ctx.createBufferSource()
     src.buffer = playBuffer()
-    src.connect(ctx.destination)
+    const g = ctx.createGain()
+    g.gain.value = gainRef.current
+    src.connect(g)
+    g.connect(ctx.destination)
     src.onended = () => {
       if (srcRef.current !== src) return // 수동 stop은 무시
       cancelAnimationFrame(rafRef.current)
@@ -159,7 +163,7 @@ export default function VoicePlayer({ buffer }: { buffer: AudioBuffer }) {
   }, [duration, playFrom, playhead])
 
   const download = useCallback(() => {
-    const blob = bufferToWav(playBuffer())
+    const blob = bufferToWav(playBuffer(), gainRef.current)
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -170,6 +174,13 @@ export default function VoicePlayer({ buffer }: { buffer: AudioBuffer }) {
 
   // 새 녹음(buffer prop 교체) 시 초기화
   useEffect(() => {
+    // 정규화 게인: 최대 피크가 0.97에 닿도록(클리핑 방지), 단 1~8배로 제한.
+    let peak = 0
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const d = buffer.getChannelData(c)
+      for (let i = 0; i < d.length; i++) { const a = d[i] < 0 ? -d[i] : d[i]; if (a > peak) peak = a }
+    }
+    gainRef.current = peak > 1e-4 ? Math.min(8, Math.max(1, 0.97 / peak)) : 1
     cancelAnimationFrame(rafRef.current)
     stopSrc()
     shiftCacheRef.current = new Map()

@@ -141,6 +141,7 @@ export default function SingScreen() {
   recordEnabledRef.current = recordEnabled
   const [recordedBuf, setRecordedBuf] = useState<AudioBuffer | null>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
+  const recStreamRef = useRef<MediaStream | null>(null) // 녹음 전용(고음질) 스트림
   const recChunksRef = useRef<Blob[]>([])
   const recCtxRef = useRef<AudioContext | null>(null)
   const [count, setCount] = useState(3)
@@ -251,14 +252,13 @@ export default function SingScreen() {
 
   const { running, error, start, stop, getStream } = useMicPitch(onFrame)
 
-  // 채점용으로 열린 마이크 스트림에 MediaRecorder를 붙여 백그라운드 녹음
-  const startRecording = useCallback(() => {
+  // 백그라운드 녹음. 채점용 스트림(노이즈서프레션/AGC로 노래가 깨지고 작아짐)이 아니라,
+  // 재생 품질을 위한 별도 스트림으로 녹음한다: NS·AGC 끔, 에코제거만 유지(스피커 누설 방지).
+  const startRecording = useCallback(async () => {
     setRecordedBuf(null)
     if (!recordEnabledRef.current) return
-    const stream = getStream()
-    if (!stream) return
-    try {
-      const rec = new MediaRecorder(stream)
+    const attach = (stream: MediaStream) => {
+      const rec = new MediaRecorder(stream, { audioBitsPerSecond: 128000 })
       recChunksRef.current = []
       rec.ondataavailable = (e) => { if (e.data.size) recChunksRef.current.push(e.data) }
       rec.onstop = async () => {
@@ -272,7 +272,19 @@ export default function SingScreen() {
       }
       rec.start()
       recorderRef.current = rec
-    } catch { /* MediaRecorder 미지원 등 무시 */ }
+    }
+    try {
+      const recStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
+      })
+      if (!recordEnabledRef.current) { recStream.getTracks().forEach((t) => t.stop()); return } // 그새 취소됨
+      recStreamRef.current = recStream
+      attach(recStream)
+    } catch {
+      // 별도 스트림 실패(권한/미지원) → 채점용 스트림으로 폴백
+      const stream = getStream()
+      if (stream) { try { attach(stream) } catch { /* noop */ } }
+    }
   }, [getStream])
 
   const stopRecording = useCallback(() => {
@@ -281,6 +293,8 @@ export default function SingScreen() {
       if (rec && rec.state !== 'inactive') rec.stop()
     } catch { /* noop */ }
     recorderRef.current = null
+    try { recStreamRef.current?.getTracks().forEach((t) => t.stop()) } catch { /* noop */ }
+    recStreamRef.current = null
   }, [])
 
   // 캔버스 사이즈
