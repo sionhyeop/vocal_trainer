@@ -295,6 +295,12 @@ def _detect_vocal_start(contour: list[dict], win_ms: int = 1000, min_pts: int = 
     return ts[0]
 
 
+def _compact(contour: list[dict], step: int = 2) -> list:
+    """[{tMs,midi}] → 다운샘플(step배) + midi 소수 1자리 + 키 없는 배열 [[tMs, midi]].
+    용량 절감용(전송량 ~1/3). 클라이언트(normalizeContour)가 구·신포맷 모두 처리."""
+    return [[c["tMs"], round(c["midi"], 1)] for c in contour[::step]]
+
+
 def extract_notemap(
     video_id: str, max_seconds: int = 120, separate: bool = True, force: bool = False, method: str = "auto"
 ) -> dict:
@@ -339,7 +345,7 @@ def extract_notemap(
         _set_progress(video_id, "마무리", 96)
         result = {
             "videoId": video_id,
-            "contour": contour,
+            "contour": _compact(contour),  # 다운샘플+소수1자리+배열 (용량 절감)
             "extractor": extractor,
             "separated": separated,
             "durationMs": int(span_ms),
