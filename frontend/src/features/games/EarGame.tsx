@@ -30,7 +30,7 @@ function makeQuestion(lv: EarLevel): Question {
     return { base, answer: semi }
   }
   const n = rand(lv.pool)
-  return { base: n, answer: ((n % 12) + 12) % 12 }
+  return { base: n, answer: n }
 }
 
 type Phase = 'select' | 'play' | 'result'
